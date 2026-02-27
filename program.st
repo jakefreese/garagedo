@@ -28,16 +28,13 @@ FUNCTION_BLOCK LIGHTING
 END_FUNCTION_BLOCK
 
 PROGRAM main
-  VAR_INPUT
-    SM_IND_STK : SINT := 0;
-    SM_8RELAY0_STK : SINT := 1;
-    SM_16DIN0_STK : SINT := 6;
-  END_VAR
   VAR
     SM_INDUSTRIAL0 : SM_INDUSTRIAL;
     SM_8RELAY0 : SM_8RELAY;
     SM_8RELAY1 : SM_8RELAY;
     SM_8RELAY1_STK : SINT := 2;
+    SM_RTD0 : SM_RTD;
+    SM_HOME0 : SM_HOME;
     SM_16DIN0 : SM_16DIN;
     TON0 : TON;
     LIGHTING0 : LIGHTING;
@@ -55,17 +52,43 @@ PROGRAM main
     HOBBY_LT AT %IX1.1 : BOOL;
     R4 AT %IX1.3 : BOOL := 1;
     R09 AT %IX2.0 : BOOL;
+    OFFICE_TEMP AT %MD0 : REAL;
+    GARAGE_TEMP AT %MD1 : REAL;
+    ATTIC_TEMP AT %MD2 : REAL;
+    HVAC_SUPPLY AT %MD3 : REAL;
+    H_IN_1 AT %QX3.0 : BOOL;
+    H_IN_2 AT %QX3.1 : BOOL;
+    H_IN_3 AT %QX3.2 : BOOL;
+    H_IN_4 AT %QX3.3 : BOOL;
+    H_RLY_3 AT %IX3.2 : BOOL := 1;
+  END_VAR
+  VAR_INPUT
+    SM_IND_STK : SINT := 0;
+    SM_8RELAY0_STK : SINT := 1;
+    SM_RTD_STK : SINT := 3;
+    SM_HOME0_STK : SINT := 5;
+    SM_16DIN0_STK : SINT := 6;
   END_VAR
 
+  SM_HOME0(STACK := SM_HOME0_STK, RELAY1 := LIGHTING0.HOBBY_LT, RELAY2 := LIGHTING0.OFFICE_LT, RELAY3 := H_RLY_3);
   SM_INDUSTRIAL0(STACK := SM_IND_STK, LED2 := L2, LED3 := L3, LED4 := L4);
+  LIGHTING0(HOBBY_LTS := SM_HOME0.OPTO3, OFFICE_LTS := SM_HOME0.OPTO4);
   SM_16DIN0(STACK := SM_16DIN0_STK);
-  LIGHTING0(HOBBY_LTS := SM_16DIN0.I1, OFFICE_LTS := SM_16DIN0.I2);
   SM_8RELAY0(STACK := SM_8RELAY0_STK);
   DIN1 := SM_INDUSTRIAL0.OPTO1;
   OFFICE_LTS := SM_16DIN0.I1;
   DIN2 := SM_INDUSTRIAL0.OPTO2;
   HOBBY_LTS := SM_16DIN0.I2;
   SM_8RELAY1(STACK := SM_8RELAY1_STK);
+  SM_RTD0(STACK := SM_RTD_STK);
+  H_IN_1 := SM_HOME0.OPTO1;
+  OFFICE_TEMP := SM_RTD0.TEMP1;
+  H_IN_2 := SM_HOME0.OPTO2;
+  GARAGE_TEMP := SM_RTD0.TEMP2;
+  H_IN_3 := SM_HOME0.OPTO3;
+  ATTIC_TEMP := SM_RTD0.TEMP3;
+  H_IN_4 := SM_HOME0.OPTO4;
+  HVAC_SUPPLY := SM_RTD0.TEMP4;
 END_PROGRAM
 
 
@@ -77,7 +100,7 @@ CONFIGURATION Config0
   END_RESOURCE
 END_CONFIGURATION
 
-(*DBG:char md5[] = "5fac51d462b6333bbf31f5e4bfa06519";*)
+(*DBG:char md5[] = "8f52d519c5fa101ec2eb60534bca97b7";*)
 (*DBG:/**)
 (*DBG: * This file is part of OpenPLC Runtime*)
 (*DBG: **)
@@ -113,7 +136,7 @@ END_CONFIGURATION
 (*DBG:#define SAME_ENDIANNESS      0*)
 (*DBG:#define REVERSE_ENDIANNESS   1*)
 (*DBG:*)
-(*DBG:char plc_program_md5[] = "5fac51d462b6333bbf31f5e4bfa06519";*)
+(*DBG:char plc_program_md5[] = "8f52d519c5fa101ec2eb60534bca97b7";*)
 (*DBG:*)
 (*DBG:uint8_t endianness;*)
 (*DBG:*)
@@ -124,9 +147,6 @@ END_CONFIGURATION
 (*DBG:    void *ptr;*)
 (*DBG:    __IEC_types_enum type;*)
 (*DBG:} debug_vars[] = {*)
-(*DBG:    {&(RES0__INSTANCE0.SM_IND_STK), SINT_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0_STK), SINT_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0_STK), SINT_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.EN), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.ENO), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.STACK), SINT_ENUM},*)
@@ -187,6 +207,56 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O8), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.DUMMY), SINT_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1_STK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_RTD0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_RTD0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_RTD0.STACK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_RTD0.TEMP1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_RTD0.TEMP2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_RTD0.TEMP3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_RTD0.TEMP4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_RTD0.TEMP5), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_RTD0.TEMP6), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_RTD0.TEMP7), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_RTD0.TEMP8), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.STACK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY5), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY6), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY7), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY8), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.Q0_10V1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.Q0_10V2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.Q0_10V3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.Q0_10V4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.QOD1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.QOD2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.QOD3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.QOD4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO5), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO6), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO7), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO8), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC5), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC6), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC7), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC8), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OWB_T1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OWB_T2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OWB_T3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OWB_T4), REAL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.EN), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.ENO), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.STACK), SINT_ENUM},*)
@@ -255,9 +325,23 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.HOBBY_LT), BOOL_P_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.R4), BOOL_P_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.R09), BOOL_P_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.OFFICE_TEMP), REAL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.GARAGE_TEMP), REAL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.ATTIC_TEMP), REAL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.HVAC_SUPPLY), REAL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.H_IN_1), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.H_IN_2), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.H_IN_3), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.H_IN_4), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.H_RLY_3), BOOL_P_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_IND_STK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0_STK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_RTD_STK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0_STK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0_STK), SINT_ENUM},*)
 (*DBG:};*)
 (*DBG:*)
-(*DBG:#define VAR_COUNT               131*)
+(*DBG:#define VAR_COUNT               192*)
 (*DBG:*)
 (*DBG:uint16_t get_var_count(void)*)
 (*DBG:{*)
@@ -271,16 +355,17 @@ END_CONFIGURATION
 (*DBG:        return 0;*)
 (*DBG:    }*)
 (*DBG:    switch (debug_vars[idx].type) {*)
+(*DBG:    case REAL_ENUM:*)
+(*DBG:    case REAL_O_ENUM:*)
+(*DBG:        return sizeof(REAL);*)
+(*DBG:    case TIME_ENUM:*)
+(*DBG:        return sizeof(TIME);*)
 (*DBG:    case BOOL_ENUM:*)
 (*DBG:    case BOOL_O_ENUM:*)
 (*DBG:    case BOOL_P_ENUM:*)
 (*DBG:        return sizeof(BOOL);*)
 (*DBG:    case SINT_ENUM:*)
 (*DBG:        return sizeof(SINT);*)
-(*DBG:    case REAL_ENUM:*)
-(*DBG:        return sizeof(REAL);*)
-(*DBG:    case TIME_ENUM:*)
-(*DBG:        return sizeof(TIME);*)
 (*DBG:    default:*)
 (*DBG:        return 0;*)
 (*DBG:    }*)
@@ -291,6 +376,14 @@ END_CONFIGURATION
 (*DBG:    void *ptr = debug_vars[idx].ptr;*)
 (*DBG:*)
 (*DBG:    switch (debug_vars[idx].type) {*)
+(*DBG:    case REAL_ENUM:*)
+(*DBG:        return (void *)&((__IEC_REAL_t *) ptr)->value;*)
+(*DBG:    case REAL_O_ENUM:*)
+(*DBG:        return (void *)((((__IEC_REAL_p *) ptr)->flags & __IEC_FORCE_FLAG)*)
+(*DBG:                        ? &(((__IEC_REAL_p *) ptr)->fvalue)*)
+(*DBG:                        : ((__IEC_REAL_p *) ptr)->value);*)
+(*DBG:    case TIME_ENUM:*)
+(*DBG:        return (void *)&((__IEC_TIME_t *) ptr)->value;*)
 (*DBG:    case BOOL_ENUM:*)
 (*DBG:        return (void *)&((__IEC_BOOL_t *) ptr)->value;*)
 (*DBG:    case BOOL_O_ENUM:*)
@@ -300,10 +393,6 @@ END_CONFIGURATION
 (*DBG:                        : ((__IEC_BOOL_p *) ptr)->value);*)
 (*DBG:    case SINT_ENUM:*)
 (*DBG:        return (void *)&((__IEC_SINT_t *) ptr)->value;*)
-(*DBG:    case REAL_ENUM:*)
-(*DBG:        return (void *)&((__IEC_REAL_t *) ptr)->value;*)
-(*DBG:    case TIME_ENUM:*)
-(*DBG:        return (void *)&((__IEC_TIME_t *) ptr)->value;*)
 (*DBG:    default:*)
 (*DBG:        return 0;*)
 (*DBG:    }*)
@@ -316,6 +405,24 @@ END_CONFIGURATION
 (*DBG:    if (forced) {*)
 (*DBG:        size_t var_size = get_var_size(idx);*)
 (*DBG:        switch (debug_vars[idx].type) {*)
+(*DBG:        case REAL_ENUM: {*)
+(*DBG:            memcpy(&((__IEC_REAL_t *) ptr)->value, val, var_size);*)
+(*DBG:            ((__IEC_REAL_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:    *)
+(*DBG:        case REAL_O_ENUM: {*)
+(*DBG:            memcpy((((__IEC_REAL_p *) ptr)->value), val, var_size);*)
+(*DBG:            memcpy(&((__IEC_REAL_p *) ptr)->fvalue, val, var_size);*)
+(*DBG:            ((__IEC_REAL_p *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:        case TIME_ENUM: {*)
+(*DBG:            memcpy(&((__IEC_TIME_t *) ptr)->value, val, var_size);*)
+(*DBG:            ((__IEC_TIME_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:    *)
 (*DBG:        case BOOL_ENUM: {*)
 (*DBG:            memcpy(&((__IEC_BOOL_t *) ptr)->value, val, var_size);*)
 (*DBG:            ((__IEC_BOOL_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
@@ -339,23 +446,20 @@ END_CONFIGURATION
 (*DBG:            break;*)
 (*DBG:        }*)
 (*DBG:    *)
-(*DBG:        case REAL_ENUM: {*)
-(*DBG:            memcpy(&((__IEC_REAL_t *) ptr)->value, val, var_size);*)
-(*DBG:            ((__IEC_REAL_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        }*)
-(*DBG:    *)
-(*DBG:        case TIME_ENUM: {*)
-(*DBG:            memcpy(&((__IEC_TIME_t *) ptr)->value, val, var_size);*)
-(*DBG:            ((__IEC_TIME_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        }*)
-(*DBG:    *)
 (*DBG:        default:*)
 (*DBG:            break;*)
 (*DBG:        }*)
 (*DBG:    } else {*)
 (*DBG:        switch (debug_vars[idx].type) {*)
+(*DBG:        case REAL_ENUM:*)
+(*DBG:            ((__IEC_REAL_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        case REAL_O_ENUM:*)
+(*DBG:            ((__IEC_REAL_p *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        case TIME_ENUM:*)
+(*DBG:            ((__IEC_TIME_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
 (*DBG:        case BOOL_ENUM:*)
 (*DBG:            ((__IEC_BOOL_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
@@ -365,12 +469,6 @@ END_CONFIGURATION
 (*DBG:            break;*)
 (*DBG:        case SINT_ENUM:*)
 (*DBG:            ((__IEC_SINT_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        case REAL_ENUM:*)
-(*DBG:            ((__IEC_REAL_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        case TIME_ENUM:*)
-(*DBG:            ((__IEC_TIME_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
 (*DBG:        default:*)
 (*DBG:            break;*)
