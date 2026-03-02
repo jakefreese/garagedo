@@ -1,0 +1,637 @@
+FUNCTION_BLOCK LIGHTING
+  VAR_INPUT
+    OFFICE_IN : BOOL;
+    HOBBY_IN : BOOL;
+    LAUNDRY_IN : BOOL;
+    CALLIE_IN : BOOL;
+    TRAVIS_IN : BOOL;
+    GARAGE_IN : BOOL;
+    FF_IN : BOOL;
+  END_VAR
+  VAR_OUTPUT
+    OFFICE_OUT : BOOL;
+    HOBBY_OUT : BOOL;
+    LAUNDRY_OUT : BOOL;
+    CALLIE_OUT : BOOL;
+    TRAVIS_OUT : BOOL;
+    GARAGE_OUT : BOOL;
+    FF_OUT : BOOL;
+  END_VAR
+  VAR
+    DB : TIME := T#500ms;
+    TON0 : TON;
+    TON1 : TON;
+    TON2 : TON;
+    TON3 : TON;
+    TON4 : TON;
+    TON5 : TON;
+    TON6 : TON;
+  END_VAR
+
+  TON0(IN := OFFICE_IN, PT := DB);
+  OFFICE_OUT := TON0.Q;
+  TON1(IN := HOBBY_IN, PT := DB);
+  HOBBY_OUT := TON1.Q;
+  TON2(IN := LAUNDRY_IN, PT := DB);
+  LAUNDRY_OUT := TON2.Q;
+  TON3(IN := CALLIE_IN, PT := DB);
+  CALLIE_OUT := TON3.Q;
+  TON4(IN := TRAVIS_IN, PT := DB);
+  OFFICE_OUT := TON4.Q;
+  TON5(IN := GARAGE_IN, PT := DB);
+  GARAGE_OUT := TON5.Q;
+  TON6(IN := FF_IN, PT := DB);
+  FF_OUT := TON6.Q;
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK WELL
+  VAR_INPUT
+    PS : BOOL;
+  END_VAR
+  VAR_OUTPUT
+    WELLPUMP1 : BOOL;
+  END_VAR
+  VAR
+    PSDB : TIME := T#1s;
+    RRDELAY : TIME := T#30s;
+    RRDELAY0 : BOOL;
+    TON0 : TON;
+    TOF0 : TOF;
+    F_TRIG1 : F_TRIG;
+  END_VAR
+
+  TON0(IN := PS, PT := PSDB);
+  WELLPUMP1 := NOT(RRDELAY0) AND TON0.Q;
+  F_TRIG1(CLK := WELLPUMP1);
+  TOF0(IN := F_TRIG1.Q, PT := RRDELAY);
+  RRDELAY0 := TOF0.Q;
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK SEPTIC
+  VAR_INPUT
+    SEPTIC_CTL_IN : BOOL;
+    SEPTIC_H_IN : BOOL;
+  END_VAR
+  VAR_OUTPUT
+    SEPTIC_HIGH : BOOL;
+    SEPTIC_PUMP_OUT : BOOL;
+  END_VAR
+  VAR
+    SEPTIC_DB : TIME := T#30s;
+    TON0 : TON;
+    SEPTIC_PUMP : BOOL;
+    TOF0 : TOF;
+    RERUNDELAY : TIME := T#5m;
+    RERUNDELAY0 : BOOL;
+    TON1 : TON;
+    F_TRIG1 : F_TRIG;
+  END_VAR
+
+  TON0(IN := SEPTIC_CTL_IN, PT := SEPTIC_DB);
+  SEPTIC_PUMP_OUT := NOT(RERUNDELAY0) AND TON0.Q;
+  F_TRIG1(CLK := SEPTIC_PUMP_OUT);
+  TOF0(IN := F_TRIG1.Q, PT := RERUNDELAY);
+  RERUNDELAY0 := TOF0.Q;
+  TON1(IN := SEPTIC_H_IN, PT := SEPTIC_DB);
+  SEPTIC_HIGH := TON1.Q;
+END_FUNCTION_BLOCK
+
+PROGRAM GARAGE_LD
+  VAR
+    SM_INDUSTRIAL0 : SM_INDUSTRIAL;
+    SM_IND_STK : SINT := 0;
+    SM_8RELAY0 : SM_8RELAY;
+    SM_8RLY_STK : SINT := 1;
+    SM_8RELAY1 : SM_8RELAY;
+    SM_8RLY2_STK : SINT := 2;
+    SM_16DIN0 : SM_16DIN;
+    SM_16IN_STK : SINT := 6;
+    DB : TIME := T#500ms;
+  END_VAR
+  VAR
+    HOBBY_LTS AT %IX0.0 : BOOL := 0;
+    OFFICE_LTS AT %IX0.1 : BOOL := 0;
+    LAUNDRY_LTS AT %IX0.2 : BOOL := 0;
+    CALLIE_LTS AT %IX0.3 : BOOL := 0;
+    TRAVIS_LTS AT %IX0.4 : BOOL := 0;
+    GARAGE_LTS AT %IX0.5 : BOOL := 0;
+    FF_LTS AT %IX0.6 : BOOL := 0;
+    SEPTIC_CTL AT %IX0.7 : BOOL := 0;
+    SEPTIC_HIGH AT %IX0.8 : BOOL := 0;
+    PS AT %IX0.9 : BOOL := 0;
+    HOBBY_LT AT %QX0.0 : BOOL := 0;
+    OFFICE_LT AT %QX0.1 : BOOL := 0;
+    TEST AT %QX0.2 : BOOL := 0;
+    LAUNDRY_LT AT %QX0.3 : BOOL := 0;
+    CALLIE_LT AT %QX0.4 : BOOL := 0;
+    TRAVIS_LT AT %QX0.5 : BOOL := 0;
+    GARAGE_LT AT %QX0.6 : BOOL := 0;
+    FF_LT AT %QX0.7 : BOOL := 0;
+    SEPTIC_PUMP AT %QX0.8 : BOOL := 0;
+    WELL_PUMP_1 AT %QX0.9 : BOOL := 0;
+  END_VAR
+  VAR
+    LIGHTING0 : LIGHTING;
+    WELL0 : WELL;
+    SEPTIC0 : SEPTIC;
+  END_VAR
+
+  SM_16DIN0(STACK := SM_16IN_STK);
+  HOBBY_LTS := SM_16DIN0.I2;
+  OFFICE_LTS := SM_16DIN0.I1;
+  LAUNDRY_LTS := SM_16DIN0.I3;
+  CALLIE_LTS := SM_16DIN0.I4;
+  TRAVIS_LTS := SM_16DIN0.I5;
+  GARAGE_LTS := SM_16DIN0.I6;
+  FF_LTS := SM_16DIN0.I7;
+  SEPTIC_CTL := SM_16DIN0.I15;
+  SEPTIC_HIGH := SM_16DIN0.I16;
+  LIGHTING0(OFFICE_IN := SM_16DIN0.I1, HOBBY_IN := SM_16DIN0.I2, LAUNDRY_IN := SM_16DIN0.I3, CALLIE_IN := SM_16DIN0.I4, TRAVIS_IN := SM_16DIN0.I5, GARAGE_IN := SM_16DIN0.I6, FF_IN := SM_16DIN0.I7);
+  SEPTIC0(SEPTIC_CTL_IN := SM_16DIN0.I15, SEPTIC_H_IN := SM_16DIN0.I16);
+  SM_8RELAY0(STACK := SM_8RLY_STK, O1 := LIGHTING0.OFFICE_OUT OR OFFICE_LT, O2 := HOBBY_LT OR LIGHTING0.HOBBY_OUT, O3 := LAUNDRY_LT OR LIGHTING0.LAUNDRY_OUT, O4 := CALLIE_LT OR LIGHTING0.CALLIE_OUT, O5 := LIGHTING0.TRAVIS_OUT OR TRAVIS_LT, O6 := GARAGE_LT OR LIGHTING0.GARAGE_OUT, O7 := FF_LT OR LIGHTING0.FF_OUT, O8 := SEPTIC0.SEPTIC_PUMP_OUT OR SEPTIC_PUMP);
+  SM_INDUSTRIAL0(STACK := SM_IND_STK);
+  WELL0(PS := SM_16DIN0.I14);
+  SM_8RELAY1(STACK := SM_8RLY2_STK, O1 := WELL0.WELLPUMP1 OR WELL_PUMP_1);
+END_PROGRAM
+
+
+CONFIGURATION Config0
+
+  RESOURCE Res0 ON PLC
+    TASK task0(INTERVAL := T#20ms,PRIORITY := 0);
+    PROGRAM instance0 WITH task0 : GARAGE_LD;
+  END_RESOURCE
+END_CONFIGURATION
+
+(*DBG:char md5[] = "bb75802ee5dd692cc42d498ba9a96134";*)
+(*DBG:/**)
+(*DBG: * This file is part of OpenPLC Runtime*)
+(*DBG: **)
+(*DBG: * Copyright (C) 2023 Autonomy, GP Orcullo*)
+(*DBG: * Based on the work by GP Orcullo on Beremiz for uC*)
+(*DBG: **)
+(*DBG: * This program is free software; you can redistribute it and/or*)
+(*DBG: * modify it under the terms of the GNU General Public License*)
+(*DBG: * as published by the Free Software Foundation; either version 2*)
+(*DBG: * of the License, or (at your option) any later version.*)
+(*DBG: **)
+(*DBG: * This program is distributed in the hope that it will be useful,*)
+(*DBG: * but WITHOUT ANY WARRANTY; without even the implied warranty of*)
+(*DBG: * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the*)
+(*DBG: * GNU General Public License for more details.*)
+(*DBG: **)
+(*DBG: * You should have received a copy of the GNU General Public License*)
+(*DBG: * along with this program; If not, see <http://www.gnu.org/licenses/>.*)
+(*DBG: **)
+(*DBG: */*)
+(*DBG:*)
+(*DBG:#include <stdbool.h>*)
+(*DBG:*)
+(*DBG:#include "iec_types_all.h"*)
+(*DBG:#include "POUS.h"*)
+(*DBG:*)
+(*DBG:#define SAME_ENDIANNESS      0*)
+(*DBG:#define REVERSE_ENDIANNESS   1*)
+(*DBG:*)
+(*DBG:uint8_t endianness;*)
+(*DBG:*)
+(*DBG:*)
+(*DBG:extern GARAGE_LD RES0__INSTANCE0;*)
+(*DBG:*)
+(*DBG:static const struct {*)
+(*DBG:    void *ptr;*)
+(*DBG:    __IEC_types_enum type;*)
+(*DBG:} debug_vars[] = {*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.STACK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.LED1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.LED2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.LED3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.LED4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q0_10V1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q0_10V2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q0_10V3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q0_10V4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q4_20MA1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q4_20MA2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q4_20MA3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q4_20MA4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.QOD1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.QOD2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.QOD3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.QOD4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OPTO1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OPTO2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OPTO3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OPTO4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I0_10V1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I0_10V2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I0_10V3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I0_10V4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I4_20MA1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I4_20MA2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I4_20MA3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I4_20MA4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OWB_T1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OWB_T2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OWB_T3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OWB_T4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_IND_STK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.STACK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O5), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O6), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O7), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O8), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.DUMMY), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RLY_STK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.STACK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O5), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O6), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O7), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O8), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.DUMMY), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RLY2_STK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.STACK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I5), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I6), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I7), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I8), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I9), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I10), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I11), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I12), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I13), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I14), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I15), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I16), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16IN_STK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.DB), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.HOBBY_LTS), BOOL_P_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.OFFICE_LTS), BOOL_P_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LAUNDRY_LTS), BOOL_P_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.CALLIE_LTS), BOOL_P_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TRAVIS_LTS), BOOL_P_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.GARAGE_LTS), BOOL_P_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.FF_LTS), BOOL_P_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC_CTL), BOOL_P_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC_HIGH), BOOL_P_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.PS), BOOL_P_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.HOBBY_LT), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.OFFICE_LT), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TEST), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LAUNDRY_LT), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.CALLIE_LT), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TRAVIS_LT), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.GARAGE_LT), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.FF_LT), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC_PUMP), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL_PUMP_1), BOOL_O_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.OFFICE_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.HOBBY_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.LAUNDRY_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.CALLIE_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TRAVIS_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.GARAGE_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.FF_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.OFFICE_OUT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.HOBBY_OUT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.LAUNDRY_OUT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.CALLIE_OUT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TRAVIS_OUT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.GARAGE_OUT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.FF_OUT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.DB), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON0.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON0.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON0.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON0.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON0.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON0.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON0.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON0.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON1.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON1.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON1.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON1.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON1.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON1.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON1.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON1.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON1.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON1.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON2.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON2.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON2.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON2.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON2.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON2.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON2.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON2.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON2.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON2.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON3.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON3.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON3.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON3.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON3.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON3.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON3.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON3.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON3.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON3.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON4.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON4.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON4.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON4.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON4.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON4.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON4.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON4.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON4.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON4.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON5.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON5.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON5.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON5.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON5.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON5.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON5.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON5.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON5.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON5.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON6.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON6.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON6.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON6.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON6.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON6.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON6.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON6.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON6.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LIGHTING0.TON6.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.PS), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.WELLPUMP1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.PSDB), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.RRDELAY), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.RRDELAY0), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TON0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TON0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TON0.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TON0.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TON0.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TON0.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TON0.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TON0.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TON0.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TON0.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TOF0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TOF0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TOF0.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TOF0.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TOF0.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TOF0.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TOF0.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TOF0.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TOF0.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.TOF0.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.F_TRIG1.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.F_TRIG1.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.F_TRIG1.CLK), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.F_TRIG1.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.F_TRIG1.M), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.SEPTIC_CTL_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.SEPTIC_H_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.SEPTIC_HIGH), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.SEPTIC_PUMP_OUT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.SEPTIC_DB), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON0.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON0.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON0.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON0.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON0.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON0.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON0.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON0.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.SEPTIC_PUMP), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TOF0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TOF0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TOF0.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TOF0.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TOF0.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TOF0.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TOF0.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TOF0.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TOF0.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TOF0.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.RERUNDELAY), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.RERUNDELAY0), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON1.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON1.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON1.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON1.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON1.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON1.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON1.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON1.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON1.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.TON1.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.F_TRIG1.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.F_TRIG1.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.F_TRIG1.CLK), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.F_TRIG1.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC0.F_TRIG1.M), BOOL_ENUM},*)
+(*DBG:};*)
+(*DBG:*)
+(*DBG:#define VAR_COUNT               267*)
+(*DBG:*)
+(*DBG:uint16_t get_var_count(void)*)
+(*DBG:{*)
+(*DBG:    return VAR_COUNT;*)
+(*DBG:}*)
+(*DBG:*)
+(*DBG:size_t get_var_size(size_t idx)*)
+(*DBG:{*)
+(*DBG:    if (idx >= VAR_COUNT)*)
+(*DBG:    {*)
+(*DBG:        return 0;*)
+(*DBG:    }*)
+(*DBG:    switch (debug_vars[idx].type) {*)
+(*DBG:    case SINT_ENUM:*)
+(*DBG:        return sizeof(SINT);*)
+(*DBG:    case TIME_ENUM:*)
+(*DBG:        return sizeof(TIME);*)
+(*DBG:    case REAL_ENUM:*)
+(*DBG:        return sizeof(REAL);*)
+(*DBG:    case BOOL_ENUM:*)
+(*DBG:    case BOOL_O_ENUM:*)
+(*DBG:    case BOOL_P_ENUM:*)
+(*DBG:        return sizeof(BOOL);*)
+(*DBG:    default:*)
+(*DBG:        return 0;*)
+(*DBG:    }*)
+(*DBG:}*)
+(*DBG:*)
+(*DBG:void *get_var_addr(size_t idx)*)
+(*DBG:{*)
+(*DBG:    void *ptr = debug_vars[idx].ptr;*)
+(*DBG:*)
+(*DBG:    switch (debug_vars[idx].type) {*)
+(*DBG:    case SINT_ENUM:*)
+(*DBG:        return (void *)&((__IEC_SINT_t *) ptr)->value;*)
+(*DBG:    case TIME_ENUM:*)
+(*DBG:        return (void *)&((__IEC_TIME_t *) ptr)->value;*)
+(*DBG:    case REAL_ENUM:*)
+(*DBG:        return (void *)&((__IEC_REAL_t *) ptr)->value;*)
+(*DBG:    case BOOL_ENUM:*)
+(*DBG:        return (void *)&((__IEC_BOOL_t *) ptr)->value;*)
+(*DBG:    case BOOL_O_ENUM:*)
+(*DBG:    case BOOL_P_ENUM:*)
+(*DBG:        return (void *)((((__IEC_BOOL_p *) ptr)->flags & __IEC_FORCE_FLAG) *)
+(*DBG:                        ? &(((__IEC_BOOL_p *) ptr)->fvalue) *)
+(*DBG:                        : ((__IEC_BOOL_p *) ptr)->value);*)
+(*DBG:    default:*)
+(*DBG:        return 0;*)
+(*DBG:    }*)
+(*DBG:}*)
+(*DBG:*)
+(*DBG:void force_var(size_t idx, bool forced, void *val)*)
+(*DBG:{*)
+(*DBG:    void *ptr = debug_vars[idx].ptr;*)
+(*DBG:*)
+(*DBG:    if (forced) {*)
+(*DBG:        size_t var_size = get_var_size(idx);*)
+(*DBG:        switch (debug_vars[idx].type) {*)
+(*DBG:        case SINT_ENUM: {*)
+(*DBG:            memcpy(&((__IEC_SINT_t *) ptr)->value, val, var_size);*)
+(*DBG:            //((__IEC_SINT_t *) ptr)->value = *((SINT *) val);*)
+(*DBG:            ((__IEC_SINT_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:        case TIME_ENUM: {*)
+(*DBG:            memcpy(&((__IEC_TIME_t *) ptr)->value, val, var_size);*)
+(*DBG:            //((__IEC_TIME_t *) ptr)->value = *((TIME *) val);*)
+(*DBG:            ((__IEC_TIME_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:        case REAL_ENUM: {*)
+(*DBG:            memcpy(&((__IEC_REAL_t *) ptr)->value, val, var_size);*)
+(*DBG:            //((__IEC_REAL_t *) ptr)->value = *((REAL *) val);*)
+(*DBG:            ((__IEC_REAL_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:        case BOOL_ENUM: {*)
+(*DBG:            memcpy(&((__IEC_BOOL_t *) ptr)->value, val, var_size);*)
+(*DBG:            //((__IEC_BOOL_t *) ptr)->value = *((BOOL *) val);*)
+(*DBG:            ((__IEC_BOOL_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:        case BOOL_O_ENUM: {*)
+(*DBG:            memcpy((((__IEC_BOOL_p *) ptr)->value), val, var_size);*)
+(*DBG:            //*(((__IEC_BOOL_p *) ptr)->value) = *((BOOL *) val);*)
+(*DBG:            ((__IEC_BOOL_p *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:        case BOOL_P_ENUM: {*)
+(*DBG:            memcpy(&((__IEC_BOOL_p *) ptr)->fvalue, val, var_size);*)
+(*DBG:            //((__IEC_BOOL_p *) ptr)->fvalue = *((BOOL *) val);*)
+(*DBG:            ((__IEC_BOOL_p *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:        default:*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:    } else {*)
+(*DBG:        switch (debug_vars[idx].type) {*)
+(*DBG:        case SINT_ENUM:*)
+(*DBG:            ((__IEC_SINT_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        case TIME_ENUM:*)
+(*DBG:            ((__IEC_TIME_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        case REAL_ENUM:*)
+(*DBG:            ((__IEC_REAL_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        case BOOL_ENUM:*)
+(*DBG:            ((__IEC_BOOL_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        case BOOL_O_ENUM:*)
+(*DBG:        case BOOL_P_ENUM:*)
+(*DBG:            ((__IEC_BOOL_p *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        default:*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:    }*)
+(*DBG:}*)
+(*DBG:*)
+(*DBG:void swap_bytes(void *ptr, size_t size) *)
+(*DBG:{*)
+(*DBG:    uint8_t *bytePtr = (uint8_t *)ptr;*)
+(*DBG:    size_t i;*)
+(*DBG:    for (i = 0; i < size / 2; ++i) *)
+(*DBG:    {*)
+(*DBG:        uint8_t temp = bytePtr[i];*)
+(*DBG:        bytePtr[i] = bytePtr[size - 1 - i];*)
+(*DBG:        bytePtr[size - 1 - i] = temp;*)
+(*DBG:    }*)
+(*DBG:}*)
+(*DBG:*)
+(*DBG:void trace_reset(void)*)
+(*DBG:{*)
+(*DBG:    for (size_t i=0; i < VAR_COUNT; i++) *)
+(*DBG:    {*)
+(*DBG:        force_var(i, false, 0);*)
+(*DBG:    }*)
+(*DBG:}*)
+(*DBG:*)
+(*DBG:void set_trace(size_t idx, bool forced, void *val)*)
+(*DBG:{*)
+(*DBG:    if (idx >= 0 && idx < VAR_COUNT) *)
+(*DBG:    {*)
+(*DBG:        if (endianness == REVERSE_ENDIANNESS)*)
+(*DBG:        {*)
+(*DBG:            // Aaaaarghhhh... Stupid AVR is Big Endian.*)
+(*DBG:            swap_bytes(val, get_var_size(idx));*)
+(*DBG:        }*)
+(*DBG:*)
+(*DBG:        force_var(idx, forced, val);*)
+(*DBG:    }*)
+(*DBG:}*)
+(*DBG:*)
+(*DBG:void set_endianness(uint8_t value)*)
+(*DBG:{*)
+(*DBG:    if (value == SAME_ENDIANNESS || value == REVERSE_ENDIANNESS)*)
+(*DBG:    {*)
+(*DBG:        endianness = value;*)
+(*DBG:    }*)
+(*DBG:}*)
+(*DBG:*)
