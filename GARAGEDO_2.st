@@ -434,7 +434,6 @@ PROGRAM GARAGE_LD
     BACK_DOOR AT %IX1.4 : BOOL := 0;
     FRONT_SECTIONAL AT %IX1.5 : BOOL := 0;
     BACK_SECTIONAL AT %IX1.6 : BOOL := 0;
-    TEST AT %IX2.6 : BOOL := 1;
     FF_LT AT %QX1.2 : BOOL := 0;
     WELL_PUMP_1 AT %QX1.4 : BOOL := 0;
   END_VAR
@@ -528,7 +527,7 @@ CONFIGURATION Config0
   END_RESOURCE
 END_CONFIGURATION
 
-(*DBG:char md5[] = "0969503a31656e25ad92ba9eb210fc8e";*)
+(*DBG:char md5[] = "50eff7218979df4232cca3b277b224ac";*)
 (*DBG:/**)
 (*DBG: * This file is part of OpenPLC Runtime*)
 (*DBG: **)
@@ -719,7 +718,6 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.BACK_DOOR), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.FRONT_SECTIONAL), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.BACK_SECTIONAL), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.TEST), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.FF_LT), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL_PUMP_1), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL0.EN), BOOL_ENUM},*)
@@ -1130,7 +1128,7 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.HVAC_SETPOINT), INT_ENUM},*)
 (*DBG:};*)
 (*DBG:*)
-(*DBG:#define VAR_COUNT               561*)
+(*DBG:#define VAR_COUNT               560*)
 (*DBG:*)
 (*DBG:uint16_t get_var_count(void)*)
 (*DBG:{*)
