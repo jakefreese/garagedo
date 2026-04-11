@@ -8,7 +8,7 @@ FUNCTION_BLOCK WELL
     WELL_METER : BOOL;
   END_VAR
   VAR_OUTPUT
-    WELL_TOTAL : DINT;
+    WELL_TOTAL : INT;
     WELL_DAILY : INT;
     WELLPUMP1 : BOOL;
   END_VAR
@@ -31,7 +31,6 @@ FUNCTION_BLOCK WELL
     F_TRIG1 : F_TRIG;
     R_TRIG2 : R_TRIG;
     R_TRIG3 : R_TRIG;
-    _TMP_INT_TO_DINT23_OUT : DINT;
     R_TRIG4 : R_TRIG;
   END_VAR
 
@@ -46,8 +45,7 @@ FUNCTION_BLOCK WELL
   CTU2(CU := R_TRIG2.Q, R := R_TRIG1.Q, PV := 10);
   R_TRIG3(CLK := CTU2.Q);
   CTU3(CU := R_TRIG3.Q, R := TOTAL_RESET, PV := 30000);
-  _TMP_INT_TO_DINT23_OUT := INT_TO_DINT(CTU3.CV);
-  WELL_TOTAL := _TMP_INT_TO_DINT23_OUT;
+  WELL_TOTAL := CTU3.CV;
   R_TRIG4(CLK := CTU2.Q);
   CTU1(CU := R_TRIG4.Q, PV := 30000);
   WELL_DAILY := CTU1.CV;
@@ -463,7 +461,7 @@ PROGRAM GARAGE_LD
     SEPTIC_PUMP AT %QX1.3 : BOOL := 0;
     WELL_PS AT %IX1.1 : BOOL := 0;
     WELL_METER AT %IX2.6 : BOOL := 0;
-    WELL_TOTAL AT %IW9 : DINT := 0;
+    WELL_TOTAL AT %IW9 : INT := 0;
     WELL_DAILY AT %IW10 : INT := 0;
     FRONT_DOOR AT %IX1.2 : BOOL := 0;
     SIDE_DOOR AT %IX1.3 : BOOL := 0;
@@ -578,7 +576,7 @@ CONFIGURATION Config0
   END_RESOURCE
 END_CONFIGURATION
 
-(*DBG:char md5[] = "988c0a7adf6d4ebe42f36ebba21ce6d0";*)
+(*DBG:char md5[] = "073a31e97676cb9fa79aaa10cb2c60a9";*)
 (*DBG:/**)
 (*DBG: * This file is part of OpenPLC Runtime*)
 (*DBG: **)
@@ -764,7 +762,7 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.SEPTIC_PUMP), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL_PS), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL_METER), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.WELL_TOTAL), DINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL_TOTAL), INT_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL_DAILY), INT_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.FRONT_DOOR), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SIDE_DOOR), BOOL_ENUM},*)
@@ -777,7 +775,7 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.WELL0.ENO), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL0.PS), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL0.WELL_METER), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.WELL0.WELL_TOTAL), DINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.WELL0.WELL_TOTAL), INT_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL0.WELL_DAILY), INT_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL0.WELLPUMP1), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL0.PSDB), TIME_ENUM},*)
@@ -870,7 +868,6 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.WELL0.R_TRIG3.CLK), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL0.R_TRIG3.Q), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL0.R_TRIG3.M), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.WELL0._TMP_INT_TO_DINT23_OUT), DINT_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL0.R_TRIG4.EN), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL0.R_TRIG4.ENO), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL0.R_TRIG4.CLK), BOOL_ENUM},*)
@@ -1255,7 +1252,7 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.HVAC_SETPOINT), INT_ENUM},*)
 (*DBG:};*)
 (*DBG:*)
-(*DBG:#define VAR_COUNT               636*)
+(*DBG:#define VAR_COUNT               635*)
 (*DBG:*)
 (*DBG:uint16_t get_var_count(void)*)
 (*DBG:{*)
@@ -1277,8 +1274,6 @@ END_CONFIGURATION
 (*DBG:        return sizeof(SINT);*)
 (*DBG:    case TIME_ENUM:*)
 (*DBG:        return sizeof(TIME);*)
-(*DBG:    case DINT_ENUM:*)
-(*DBG:        return sizeof(DINT);*)
 (*DBG:    case INT_ENUM:*)
 (*DBG:        return sizeof(INT);*)
 (*DBG:    default:*)
@@ -1299,8 +1294,6 @@ END_CONFIGURATION
 (*DBG:        return (void *)&((__IEC_SINT_t *) ptr)->value;*)
 (*DBG:    case TIME_ENUM:*)
 (*DBG:        return (void *)&((__IEC_TIME_t *) ptr)->value;*)
-(*DBG:    case DINT_ENUM:*)
-(*DBG:        return (void *)&((__IEC_DINT_t *) ptr)->value;*)
 (*DBG:    case INT_ENUM:*)
 (*DBG:        return (void *)&((__IEC_INT_t *) ptr)->value;*)
 (*DBG:    default:*)
@@ -1339,12 +1332,6 @@ END_CONFIGURATION
 (*DBG:            ((__IEC_TIME_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
 (*DBG:        }*)
-(*DBG:        case DINT_ENUM: {*)
-(*DBG:            memcpy(&((__IEC_DINT_t *) ptr)->value, val, var_size);*)
-(*DBG:            //((__IEC_DINT_t *) ptr)->value = *((DINT *) val);*)
-(*DBG:            ((__IEC_DINT_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        }*)
 (*DBG:        case INT_ENUM: {*)
 (*DBG:            memcpy(&((__IEC_INT_t *) ptr)->value, val, var_size);*)
 (*DBG:            //((__IEC_INT_t *) ptr)->value = *((INT *) val);*)
@@ -1367,9 +1354,6 @@ END_CONFIGURATION
 (*DBG:            break;*)
 (*DBG:        case TIME_ENUM:*)
 (*DBG:            ((__IEC_TIME_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        case DINT_ENUM:*)
-(*DBG:            ((__IEC_DINT_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
 (*DBG:        case INT_ENUM:*)
 (*DBG:            ((__IEC_INT_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
