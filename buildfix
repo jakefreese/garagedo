@@ -1,0 +1,5 @@
+cd ~/OpenPLC_v3 && \
+mkdir -p webserver/build && \
+sudo chown -R $USER:$USER webserver/build && \
+sudo chmod -R 755 webserver/build && \
+rm -rf webserver/build/*
