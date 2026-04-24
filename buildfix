@@ -3,3 +3,19 @@ mkdir -p webserver/build && \
 sudo chown -R $USER:$USER webserver/build && \
 sudo chmod -R 755 webserver/build && \
 rm -rf webserver/build/*
+
+
+# 1. Stop ALL OpenPLC processes
+pkill -9 -f openplc
+sudo pkill -9 -f openplc
+
+# 2. Fix ownership of the entire folder to your user (jaker)
+cd /home/jaker/OpenPLC_v3
+sudo chown -R jaker:jaker .
+
+# 3. Make sure the build folder exists and is fully writable
+mkdir -p webserver/build
+chmod -R 777 webserver/build
+
+# 4. Start OpenPLC as jaker (NOT as root)
+./openplc
