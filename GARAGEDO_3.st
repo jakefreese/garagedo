@@ -516,7 +516,6 @@ PROGRAM GARAGE_LD
     DB : TIME := T#80ms;
   END_VAR
   VAR
-    test AT %QX4.0 : BOOL := 1;
     HOBBY_LTS AT %IX1.7 : BOOL := 0;
     HOBBY_LT AT %QX0.1 : BOOL := 0;
     OFFICE_LTS AT %IX0.1 : BOOL := 0;
@@ -677,7 +676,7 @@ CONFIGURATION Config0
   END_RESOURCE
 END_CONFIGURATION
 
-(*DBG:char md5[] = "f2662db32c35d84ca5fb4591526ae09f";*)
+(*DBG:char md5[] = "d72c1f6ccc22412bf3f9b377b7339879";*)
 (*DBG:/**)
 (*DBG: * This file is part of OpenPLC Runtime*)
 (*DBG: **)
@@ -840,7 +839,6 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OWB_T4), REAL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_HOME_STK), SINT_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.DB), TIME_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.TEST), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.HOBBY_LTS), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.HOBBY_LT), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.OFFICE_LTS), BOOL_ENUM},*)
@@ -1596,7 +1594,7 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.SM_4REL4IN0.BUTTON), BOOL_ENUM},*)
 (*DBG:};*)
 (*DBG:*)
-(*DBG:#define VAR_COUNT               878*)
+(*DBG:#define VAR_COUNT               877*)
 (*DBG:*)
 (*DBG:uint16_t get_var_count(void)*)
 (*DBG:{*)
