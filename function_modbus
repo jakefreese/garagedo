@@ -1,26 +1,24 @@
-// === Monitor C1 and control UI LED ===
-const varName = "C1";      // Change if you want to monitor another variable
+// === Simple & Reliable LED control for C1 ===
+const varName = "C1";
 
 if (msg.payload && typeof msg.payload === "object") {
     
-    const value = msg.payload[varName];
+    let value = msg.payload[varName];
     
-    if (value === 1) {
-        // Turn LED ON
-        node.send([
-            { payload: "C1 is ACTIVE (1)", topic: "C1" },   // Output 1 → Debug node
-            { payload: true }                                // Output 2 → UI LED
-        ]);
-    } 
-    else {
-        // Turn LED OFF
-        node.send([
-            { payload: `C1 = ${value}`, topic: "C1" },      // Output 1 → Debug (optional)
-            { payload: false }                               // Output 2 → UI LED
-        ]);
+    // In case the value comes as string "1"
+    if (value === "1" || value === 1) {
+        return [ 
+            { payload: "C1 is ON" },     // Output 1 → Debug
+            { payload: true }            // Output 2 → UI LED (ON)
+        ];
+    } else {
+        return [ 
+            { payload: `C1 = ${value}` }, 
+            { payload: false }           // Output 2 → UI LED (OFF)
+        ];
     }
     
 } else {
-    // Safety: turn LED off if payload is invalid
-    node.send([null, { payload: false }]);
+    // Safety fallback
+    return [ null, { payload: false } ];
 }
