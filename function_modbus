@@ -1,31 +1,26 @@
-// Check specific value from buffer-parser (key/value object)
-const varName = "C1";        // Change this to any variable you want to monitor
-const targetValue = 1;       // What value should trigger the action
+// === Monitor C1 and control UI LED ===
+const varName = "C1";      // Change if you want to monitor another variable
 
 if (msg.payload && typeof msg.payload === "object") {
     
     const value = msg.payload[varName];
     
-    if (value === targetValue) {
-        // === ACTION WHEN C1 == 1 ===
-        
-        // 1. Send to Debug node
-        node.send([ 
-            { payload: `${varName} is ${value} !`, topic: "ALERT" },   // Debug output
-            { payload: true }                                         // UI LED ON
+    if (value === 1) {
+        // Turn LED ON
+        node.send([
+            { payload: "C1 is ACTIVE (1)", topic: "C1" },   // Output 1 → Debug node
+            { payload: true }                                // Output 2 → UI LED
         ]);
-        
-    } else {
-        // Optional: Turn LED OFF when not 1
-        node.send([ 
-            null, 
-            { payload: false } 
+    } 
+    else {
+        // Turn LED OFF
+        node.send([
+            { payload: `C1 = ${value}`, topic: "C1" },      // Output 1 → Debug (optional)
+            { payload: false }                               // Output 2 → UI LED
         ]);
     }
     
 } else {
-    node.warn("Payload is not a valid key/value object from buffer-parser");
-    node.send([null, { payload: false }]);  // Turn LED off on error
+    // Safety: turn LED off if payload is invalid
+    node.send([null, { payload: false }]);
 }
-
-return;  // Important when using multiple outputs
