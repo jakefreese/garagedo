@@ -1,24 +1,25 @@
-// === Simple & Reliable LED control for C1 ===
+// === C1 LED Control - Fixed Version ===
 const varName = "C1";
 
 if (msg.payload && typeof msg.payload === "object") {
     
-    let value = msg.payload[varName];
+    const value = msg.payload[varName];
     
-    // In case the value comes as string "1"
-    if (value === "1" || value === 1) {
-        return [ 
-            { payload: "C1 is ON" },     // Output 1 → Debug
-            { payload: true }            // Output 2 → UI LED (ON)
+    if (value === 1 || value === "1") {
+        // LED ON
+        return [
+            { payload: "C1 = 1  → LED ON" },   // Output 1 → Debug
+            { payload: true }                   // Output 2 → ui-led  (MUST be boolean true)
         ];
     } else {
-        return [ 
-            { payload: `C1 = ${value}` }, 
-            { payload: false }           // Output 2 → UI LED (OFF)
+        // LED OFF
+        return [
+            { payload: `C1 = ${value}  → LED OFF` },
+            { payload: false }                  // Output 2 → ui-led
         ];
     }
     
-} else {
-    // Safety fallback
-    return [ null, { payload: false } ];
 }
+
+// Safety fallback
+return [null, { payload: false }];
