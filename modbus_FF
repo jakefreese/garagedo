@@ -1,0 +1,18 @@
+// === Ultra Safe FC1 Filter ===
+if (!msg.payload) return null;
+
+let data = msg.payload;
+
+if (!Array.isArray(data)) {
+    if (data.buffer && Array.isArray(data.buffer)) data = data.buffer;
+    else if (data.data && Array.isArray(data.data)) data = data.data;
+}
+
+if (Array.isArray(data) && data.length === 24) {
+    msg.topic = "coils_FC1";
+    msg.originalPayload = msg.payload;   // keep original if needed
+    msg.payload = data;                  // ensure clean array for buffer-parser
+    return msg;
+}
+
+return null;
