@@ -1,7 +1,32 @@
-// Quick length-based (if reliable)
-if (msg.payload && Array.isArray(msg.payload) && msg.payload.length === 24) {
-    msg.topic = "coils_FC1";
-    msg.fc = 1;
-    return msg;
+// === STRICT FC1 (Coils) Filter - Checks actual buffer bytes ===
+const payload = msg.payload;
+
+if (!payload) return null;
+
+// Look for the raw buffer in common locations
+let buffer = payload.buffer || payload.data || msg.responseBuffer?.buffer;
+
+if (Buffer.isBuffer(buffer) || Array.isArray(buffer)) {
+    
+    // Convert to Buffer if it's an array
+    if (Array.isArray(buffer)) {
+        buffer = Buffer.from(buffer);
+    }
+
+    // FC1 (Read Coils) response usually starts with 0x01 (function code)
+    // You mentioned "6a 03 00" or "06" — let's check first few bytes
+    if (buffer.length >= 3) {
+        const byte0 = buffer[0];
+        const byte1 = buffer[1];
+        const byte2 = buffer[2];
+
+        // Common FC1 patterns
+        if (byte0 === 0x01 || byte0 === 6 || byte0 === 0x6A) {   // FC echoed or your "06"
+            msg.topic = "coils_FC1";
+            msg.fc = 1;
+            return msg;          // ← Only FC1 passes through
+        }
+    }
 }
-return null;
+
+return null;   // Drop FC2 and everything else
