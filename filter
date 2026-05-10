@@ -1,0 +1,7 @@
+// Quick length-based (if reliable)
+if (msg.payload && Array.isArray(msg.payload) && msg.payload.length === 24) {
+    msg.topic = "coils_FC1";
+    msg.fc = 1;
+    return msg;
+}
+return null;
