@@ -1,0 +1,30 @@
+// Store current states in context
+let heat = flow.get('heatMode') || false;
+let cool = flow.get('coolMode') || false;
+
+const msgTopic = msg.topic || 'unknown';
+
+// Handle incoming command from dashboard
+if (msgTopic === 'heat') {
+    if (msg.payload === true && cool === true) {
+        // Cool is on → reject heat
+        return [null, {payload: false, topic: 'heat'}]; // force heat switch off
+    } else {
+        heat = msg.payload;
+    }
+} 
+else if (msgTopic === 'cool') {
+    if (msg.payload === true && heat === true) {
+        // Heat is on → reject cool
+        return [null, null, {payload: false, topic: 'cool'}]; // force cool switch off
+    } else {
+        cool = msg.payload;
+    }
+}
+
+// Save states
+flow.set('heatMode', heat);
+flow.set('coolMode', cool);
+
+// Output the allowed command downstream
+return [{payload: heat, topic: 'heat'}, {payload: cool, topic: 'cool'}, null];
