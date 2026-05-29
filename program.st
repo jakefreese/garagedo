@@ -444,17 +444,15 @@ FUNCTION_BLOCK WELL
   TON0(IN := Pressure_SW, PT := PS_DB_time);
   _TMP_NOT821916_OUT := NOT(RR_delay);
   _TMP_AND6782840_OUT := AND(TON0.Q, _TMP_NOT821916_OUT);
-  Well_Pump_1 := _TMP_AND6782840_OUT;
-  TOF0(IN := Well_Pump_1, PT := RR_delay_time);
+  WELL_PUMP_1 := _TMP_AND6782840_OUT;
+  TOF0(IN := WELL_PUMP_1, PT := RR_delay_time);
   RR_delay := TOF0.Q;
   CTU_UDINT2(CU := Water_Meter, R := Reset_Pulse, PV := Water_Meter_TOT_L);
-  RTC0(PDT := RTC_INPUT);
-  DAYRESET0(RTC_IN := RTC0.CDT);
+  DAYRESET0();
   R_TRIG0(CLK := DAYRESET0.NewDayPulse);
   _TMP_DIV10408309_OUT := DIV(CTU_UDINT2.CV, 10);
   Reset_Pulse := R_TRIG0.Q;
   Water_Meter_TOT := _TMP_DIV10408309_OUT;
-  RTC_OUTPUT := RTC0.CDT;
   CTU4(CU := Reset_Pulse, PV := counter_PV);
   CTU3(CU := Water_Meter, PV := Water_Meter_DR);
   reset_counter := CTU4.CV;
@@ -601,21 +599,8 @@ PROGRAM main
     SM_16DIN0_STACK : SINT := 5;
     WELL_PUMP_1 : BOOL;
     WATER_FLOW_CNT : BOOL;
-    HVAC_FB0 : HVAC_FB;
-    SEPTIC0 : SEPTIC;
-    LIGHTING0 : LIGHTING;
-    C_F0 : C_F;
-    WELL0 : WELL;
-    DOORS0 : DOORS;
-    TSW_GENERATOR0 : TSW_GENERATOR;
-    SM_8RELAY7 : SM_8RELAY;
-    SM_8RELAY6 : SM_8RELAY;
-    SM_HOME2 : SM_HOME;
-    SM_INDUSTRIAL2 : SM_INDUSTRIAL;
-    SM_RTD0 : SM_RTD;
-    HOBBY_LTS : BOOL;
-    SM_16DIN4 : SM_16DIN;
     OFFICE_LTS : BOOL;
+    HOBBY_LTS : BOOL;
     LAUNDRY_LTS : BOOL;
     CALLIE_LTS : BOOL;
     TRAVIS_LTS : BOOL;
@@ -630,6 +615,19 @@ PROGRAM main
     RV_LTS : BOOL;
     SEPTIC_CTL : BOOL;
     SEPTIC_HIGH : BOOL;
+    HVAC_FB0 : HVAC_FB;
+    SEPTIC0 : SEPTIC;
+    LIGHTING0 : LIGHTING;
+    C_F0 : C_F;
+    WELL0 : WELL;
+    DOORS0 : DOORS;
+    TSW_GENERATOR0 : TSW_GENERATOR;
+    SM_INDUSTRIAL0 : SM_INDUSTRIAL;
+    SM_8RELAY0 : SM_8RELAY;
+    SM_8RELAY1 : SM_8RELAY;
+    SM_16DIN0 : SM_16DIN;
+    SM_RTD0 : SM_RTD;
+    SM_HOME0 : SM_HOME;
   END_VAR
   VAR
     WELL_PS AT %IX0.4 : BOOL;
@@ -719,55 +717,53 @@ PROGRAM main
     TEST_RUN_GEN AT %QX6.7 : BOOL;
   END_VAR
 
-  SM_8RELAY7(STACK := SM_8RELAY1_STACK);
+  SM_8RELAY0(STACK := SM_8RELAY1_STACK);
   LIGHTING0(Hobby_LTS := HOBBY_LTS, Hobby_LTS_V := HOBBY_LTS_V, Office_LTS := HOBBY_LTS, Office_LTS_V := OFFICE_LTS_V, Laundry_LTS := LAUNDRY_LTS, Laundry_LTS_V := LAUNDRY_LTS_V, Callie_LTS := CALLIE_LTS, Callie_LTS_V := CALLIE_LTS_V, Travis_LTS := TRAVIS_LTS, Travis_LTS_V := TRAVIS_LTS_V, Garage_LTS := GARAGE_LTS, Garage_LTS_V := GARAGE_LTS_V, EXT_F_LTS := EXT_F_LTS, EXT_F_LTS_V := EXT_F_LTS_V, EXT_B_LTS := EXT_B_LTS, EXT_B_LTS_V := EXT_B_LTS_V, RV_LTS := RV_LTS, RV_LTS_V := RV_LTS_V, ALL_ON := LIGHTS_ALL_ON, ALL_OFF := LIGHTS_ALL_OFF);
-  SM_8RELAY6(STACK := SM_8RELAY0_STACK);
+  SM_8RELAY0(STACK := SM_8RELAY0_STACK);
   HVAC_FB0(HVAC_Office_zone := HVAC_OFFICE, HVAC_Garage_zone := HVAC_GARAGE, HVAC_Heat_mode := HVAC_H_M_V, HVAC_AC_mode := HVAC_C_M_V, Fan_mode := HVAC_F_M_V, Recirc_Mode := HVAC_R_M_V, Pan_SW := HVAC_PAN_SW, Office_T_DN := HVAC_O_TEMP_DN, Office_T_UP_1 := HVAC_O_TEMP_UP, Garage_T_UP := HVAC_G_TEMP_UP, Garage_T_DN := HVAC_G_TEMP_DN, Garage_Temp := GARAGE_TEMP, Office_Temp := OFFICE_TEMP);
-  SM_HOME2(STACK := SM_HOME0_STACK, RELAY1 := HVAC_FB0.HVAC_Comp, RELAY2 := HVAC_FB0.HVAC_Heat, RELAY3 := HVAC_FB0.HVAC_Fan, RELAY4 := HVAC_FB0.O_damp_OPEN, RELAY5 := HVAC_FB0.G_damp_OPEN, RELAY6 := HVAC_FB0.O_damp_CLD, RELAY7 := HVAC_FB0.G_damp_CLD);
+  SM_HOME0(STACK := SM_HOME0_STACK, RELAY1 := HVAC_FB0.HVAC_Comp, RELAY2 := HVAC_FB0.HVAC_Heat, RELAY3 := HVAC_FB0.HVAC_Fan, RELAY4 := HVAC_FB0.O_damp_OPEN, RELAY5 := HVAC_FB0.G_damp_OPEN, RELAY6 := HVAC_FB0.O_damp_CLD, RELAY7 := HVAC_FB0.G_damp_CLD);
   HOBBY_LT := LIGHTING0.Hobby_LT;
-  SM_16DIN4(STACK := SM_16DIN0_STACK);
-  GEN_AUTO := SM_HOME2.OPTO1;
-  HOBBY_LTS := SM_16DIN4.I1;
+  SM_16DIN0(STACK := SM_16DIN0_STACK);
+  GEN_AUTO := SM_HOME0.OPTO1;
+  HOBBY_LTS := SM_16DIN0.I1;
   OFFICE_LT := LIGHTING0.Office_LT;
-  SM_INDUSTRIAL2(STACK := SM_IND_STACK);
-  GEN_AUTO := SM_HOME2.OPTO2;
-  GEN_RUNNING := SM_INDUSTRIAL2.OPTO1;
-  OFFICE_LTS := SM_16DIN4.I2;
+  SM_INDUSTRIAL0(STACK := SM_IND_STACK);
+  GEN_RUNNING := SM_INDUSTRIAL0.OPTO1;
+  OFFICE_LTS := SM_16DIN0.I2;
   LAUNDRY_LT := LIGHTING0.Laundry_LT;
-  GEN_AUTO := SM_HOME2.OPTO3;
-  Utility_PWR := SM_INDUSTRIAL2.OPTO2;
-  LAUNDRY_LTS := SM_16DIN4.I3;
+  Utility_PWR := SM_INDUSTRIAL0.OPTO2;
+  LAUNDRY_LTS := SM_16DIN0.I3;
   FF_LT := LIGHTING0.FF_LT;
-  T_SW_GEN := SM_INDUSTRIAL2.OPTO3;
-  CALLIE_LTS := SM_16DIN4.I4;
+  T_SW_GEN := SM_INDUSTRIAL0.OPTO3;
+  CALLIE_LTS := SM_16DIN0.I4;
   CALLIE_LT := LIGHTING0.Callie_LT;
-  HVAC_HEAT_M := SM_HOME2.OPTO5;
-  T_SW_UTILITY := SM_INDUSTRIAL2.OPTO4;
-  TRAVIS_LTS := SM_16DIN4.I5;
+  HVAC_HEAT_M := SM_HOME0.OPTO5;
+  T_SW_UTILITY := SM_INDUSTRIAL0.OPTO4;
+  TRAVIS_LTS := SM_16DIN0.I5;
   TRAVIS_LT := LIGHTING0.Travis_LT;
-  HVAC_COOL_M := SM_HOME2.OPTO6;
-  GARAGE_LTS := SM_16DIN4.I6;
+  HVAC_COOL_M := SM_HOME0.OPTO6;
+  GARAGE_LTS := SM_16DIN0.I6;
   GARAGE_LT := LIGHTING0.Garage_LT;
-  HVAC_GARAGE := SM_HOME2.OPTO7;
-  EXT_F_LTS := SM_16DIN4.I7;
+  HVAC_GARAGE := SM_HOME0.OPTO7;
+  EXT_F_LTS := SM_16DIN0.I7;
   EXT_F_LT := LIGHTING0.EXT_F_LT;
-  HVAC_OFFICE := SM_HOME2.OPTO8;
-  EXT_B_LTS := SM_16DIN4.I8;
+  HVAC_OFFICE := SM_HOME0.OPTO8;
+  EXT_B_LTS := SM_16DIN0.I8;
   EXT_B_LT := LIGHTING0.EXT_B_LT;
-  RV_LTS := SM_16DIN4.I9;
+  RV_LTS := SM_16DIN0.I9;
   RV_LT := LIGHTING0.RV_LT;
-  D_FRNT := SM_16DIN4.I10;
-  D_SIDE := SM_16DIN4.I11;
+  D_FRNT := SM_16DIN0.I10;
+  D_SIDE := SM_16DIN0.I11;
   DOORS0(Front := D_FRNT, Back := D_BACK, Side := D_SIDE, Front_Sec := D_FRT_SEC, Back_Sec := D_BCK_SEC);
-  D_BACK := SM_16DIN4.I12;
+  D_BACK := SM_16DIN0.I12;
   FRONT_DOOR := DOORS0.Front0;
-  D_FRT_SEC := SM_16DIN4.I13;
+  D_FRT_SEC := SM_16DIN0.I13;
   BACK_DOOR := DOORS0.Back0;
-  D_BCK_SEC := SM_16DIN4.I14;
+  D_BCK_SEC := SM_16DIN0.I14;
   SIDE_DOOR := DOORS0.Side0;
-  SEPTIC_CTL := SM_16DIN4.I15;
+  SEPTIC_CTL := SM_16DIN0.I15;
   FRONT_SEC_DOOR := DOORS0.Front_Sec0;
-  SEPTIC_HIGH := SM_16DIN4.I16;
+  SEPTIC_HIGH := SM_16DIN0.I16;
   BACK_SEC_DOOR := DOORS0.Back_Sec0;
   SM_RTD0(STACK := SM_RTD0_STACK);
   C_F0(Office_C_in := SM_RTD0.TEMP1, Garage_C_in := SM_RTD0.TEMP2, Exterior_C_in := SM_RTD0.TEMP3, RV_C_in := SM_RTD0.TEMP4, HVAC_Sup_C_in := SM_RTD0.TEMP5, HVAC_ret_C_in := SM_RTD0.TEMP6, HVAC_L_C_in := SM_RTD0.TEMP7, HVAC_V_C_in := SM_RTD0.TEMP8);
@@ -807,7 +803,7 @@ FUNCTION_BLOCK DAYRESET
   END_VAR
 
   (*// Main logic*)
-  CurrentDate := DT_TO_DATE(RTC_IN);
+  CurrentDate := RTC_IN;
 
   IF CurrentDate <> LastDate THEN
       NewDayPulse := TRUE;
@@ -826,7 +822,7 @@ CONFIGURATION Config0
   END_RESOURCE
 END_CONFIGURATION
 
-(*DBG:char md5[] = "ac555ff12cf2e91723dd4dc3fffcadbf";*)
+(*DBG:char md5[] = "1d55b38d1d6fae4d4f6a340715c5746c";*)
 (*DBG:/**)
 (*DBG: * This file is part of OpenPLC Runtime*)
 (*DBG: **)
@@ -862,7 +858,7 @@ END_CONFIGURATION
 (*DBG:#define SAME_ENDIANNESS      0*)
 (*DBG:#define REVERSE_ENDIANNESS   1*)
 (*DBG:*)
-(*DBG:char plc_program_md5[] = "ac555ff12cf2e91723dd4dc3fffcadbf";*)
+(*DBG:char plc_program_md5[] = "1d55b38d1d6fae4d4f6a340715c5746c";*)
 (*DBG:*)
 (*DBG:uint8_t endianness;*)
 (*DBG:*)
@@ -881,6 +877,22 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.SM_16DIN0_STACK), SINT_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL_PUMP_1), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WATER_FLOW_CNT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.OFFICE_LTS), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.HOBBY_LTS), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.LAUNDRY_LTS), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.CALLIE_LTS), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TRAVIS_LTS), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.GARAGE_LTS), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.EXT_F_LTS), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.EXT_B_LTS), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.D_FRNT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.D_BACK), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.D_SIDE), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.D_FRT_SEC), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.D_BCK_SEC), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.RV_LTS), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC_CTL), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SEPTIC_HIGH), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.HVAC_FB0.EN), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.HVAC_FB0.ENO), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.HVAC_FB0.HVAC_OFFICE_ZONE), BOOL_ENUM},*)
@@ -1915,104 +1927,84 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.TSW_GENERATOR0._TMP_NOT5976698_OUT), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.TSW_GENERATOR0._TMP_AND4394723_OUT), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.TSW_GENERATOR0._TMP_NOT4789645_OUT), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY7.EN), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY7.ENO), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY7.STACK), SINT_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY7.O1), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY7.O2), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY7.O3), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY7.O4), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY7.O5), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY7.O6), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY7.O7), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY7.O8), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY7.DUMMY), SINT_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY6.EN), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY6.ENO), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY6.STACK), SINT_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY6.O1), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY6.O2), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY6.O3), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY6.O4), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY6.O5), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY6.O6), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY6.O7), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY6.O8), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY6.DUMMY), SINT_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.EN), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.ENO), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.STACK), SINT_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.RELAY1), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.RELAY2), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.RELAY3), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.RELAY4), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.RELAY5), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.RELAY6), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.RELAY7), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.RELAY8), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.Q0_10V1), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.Q0_10V2), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.Q0_10V3), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.Q0_10V4), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.QOD1), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.QOD2), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.QOD3), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.QOD4), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.OPTO1), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.OPTO2), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.OPTO3), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.OPTO4), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.OPTO5), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.OPTO6), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.OPTO7), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.OPTO8), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.ADC1), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.ADC2), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.ADC3), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.ADC4), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.ADC5), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.ADC6), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.ADC7), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.ADC8), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.OWB_T1), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.OWB_T2), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.OWB_T3), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_HOME2.OWB_T4), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.EN), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.ENO), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.STACK), SINT_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.LED1), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.LED2), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.LED3), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.LED4), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.Q0_10V1), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.Q0_10V2), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.Q0_10V3), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.Q0_10V4), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.Q4_20MA1), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.Q4_20MA2), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.Q4_20MA3), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.Q4_20MA4), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.QOD1), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.QOD2), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.QOD3), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.QOD4), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.OPTO1), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.OPTO2), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.OPTO3), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.OPTO4), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.I0_10V1), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.I0_10V2), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.I0_10V3), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.I0_10V4), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.I4_20MA1), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.I4_20MA2), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.I4_20MA3), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.I4_20MA4), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.OWB_T1), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.OWB_T2), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.OWB_T3), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL2.OWB_T4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.STACK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.LED1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.LED2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.LED3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.LED4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q0_10V1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q0_10V2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q0_10V3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q0_10V4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q4_20MA1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q4_20MA2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q4_20MA3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.Q4_20MA4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.QOD1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.QOD2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.QOD3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.QOD4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OPTO1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OPTO2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OPTO3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OPTO4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I0_10V1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I0_10V2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I0_10V3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I0_10V4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I4_20MA1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I4_20MA2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I4_20MA3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.I4_20MA4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OWB_T1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OWB_T2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OWB_T3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_INDUSTRIAL0.OWB_T4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.STACK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O5), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O6), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O7), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.O8), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY0.DUMMY), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.STACK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O5), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O6), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O7), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.O8), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_8RELAY1.DUMMY), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.STACK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I5), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I6), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I7), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I8), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I9), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I10), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I11), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I12), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I13), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I14), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I15), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_16DIN0.I16), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_RTD0.EN), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_RTD0.ENO), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_RTD0.STACK), SINT_ENUM},*)
@@ -2024,41 +2016,45 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.SM_RTD0.TEMP6), REAL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_RTD0.TEMP7), REAL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SM_RTD0.TEMP8), REAL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.HOBBY_LTS), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.EN), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.ENO), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.STACK), SINT_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I1), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I2), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I3), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I4), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I5), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I6), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I7), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I8), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I9), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I10), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I11), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I12), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I13), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I14), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I15), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SM_16DIN4.I16), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.OFFICE_LTS), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.LAUNDRY_LTS), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.CALLIE_LTS), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.TRAVIS_LTS), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.GARAGE_LTS), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.EXT_F_LTS), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.EXT_B_LTS), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.D_FRNT), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.D_BACK), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.D_SIDE), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.D_FRT_SEC), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.D_BCK_SEC), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.RV_LTS), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SEPTIC_CTL), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.SEPTIC_HIGH), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.STACK), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY5), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY6), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY7), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.RELAY8), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.Q0_10V1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.Q0_10V2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.Q0_10V3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.Q0_10V4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.QOD1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.QOD2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.QOD3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.QOD4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO1), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO2), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO3), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO4), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO5), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO6), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO7), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OPTO8), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC4), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC5), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC6), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC7), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.ADC8), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OWB_T1), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OWB_T2), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OWB_T3), REAL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.SM_HOME0.OWB_T4), REAL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL_PS), BOOL_P_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WELL_PUMP_1_I), REAL_O_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.WATER_PRESSURE), REAL_O_ENUM},*)
@@ -2160,9 +2156,16 @@ END_CONFIGURATION
 (*DBG:        return 0;*)
 (*DBG:    }*)
 (*DBG:    switch (debug_vars[idx].type) {*)
+(*DBG:    case INT_ENUM:*)
+(*DBG:    case INT_O_ENUM:*)
+(*DBG:        return sizeof(INT);*)
+(*DBG:    case SINT_ENUM:*)
+(*DBG:        return sizeof(SINT);*)
 (*DBG:    case REAL_ENUM:*)
 (*DBG:    case REAL_O_ENUM:*)
 (*DBG:        return sizeof(REAL);*)
+(*DBG:    case TIME_ENUM:*)
+(*DBG:        return sizeof(TIME);*)
 (*DBG:    case BOOL_ENUM:*)
 (*DBG:    case BOOL_O_ENUM:*)
 (*DBG:    case BOOL_P_ENUM:*)
@@ -2172,13 +2175,6 @@ END_CONFIGURATION
 (*DBG:    case UDINT_ENUM:*)
 (*DBG:    case UDINT_O_ENUM:*)
 (*DBG:        return sizeof(UDINT);*)
-(*DBG:    case SINT_ENUM:*)
-(*DBG:        return sizeof(SINT);*)
-(*DBG:    case INT_ENUM:*)
-(*DBG:    case INT_O_ENUM:*)
-(*DBG:        return sizeof(INT);*)
-(*DBG:    case TIME_ENUM:*)
-(*DBG:        return sizeof(TIME);*)
 (*DBG:    default:*)
 (*DBG:        return 0;*)
 (*DBG:    }*)
@@ -2189,12 +2185,22 @@ END_CONFIGURATION
 (*DBG:    void *ptr = debug_vars[idx].ptr;*)
 (*DBG:*)
 (*DBG:    switch (debug_vars[idx].type) {*)
+(*DBG:    case INT_ENUM:*)
+(*DBG:        return (void *)&((__IEC_INT_t *) ptr)->value;*)
+(*DBG:    case INT_O_ENUM:*)
+(*DBG:        return (void *)((((__IEC_INT_p *) ptr)->flags & __IEC_FORCE_FLAG)*)
+(*DBG:                        ? &(((__IEC_INT_p *) ptr)->fvalue)*)
+(*DBG:                        : ((__IEC_INT_p *) ptr)->value);*)
+(*DBG:    case SINT_ENUM:*)
+(*DBG:        return (void *)&((__IEC_SINT_t *) ptr)->value;*)
 (*DBG:    case REAL_ENUM:*)
 (*DBG:        return (void *)&((__IEC_REAL_t *) ptr)->value;*)
 (*DBG:    case REAL_O_ENUM:*)
 (*DBG:        return (void *)((((__IEC_REAL_p *) ptr)->flags & __IEC_FORCE_FLAG)*)
 (*DBG:                        ? &(((__IEC_REAL_p *) ptr)->fvalue)*)
 (*DBG:                        : ((__IEC_REAL_p *) ptr)->value);*)
+(*DBG:    case TIME_ENUM:*)
+(*DBG:        return (void *)&((__IEC_TIME_t *) ptr)->value;*)
 (*DBG:    case BOOL_ENUM:*)
 (*DBG:        return (void *)&((__IEC_BOOL_t *) ptr)->value;*)
 (*DBG:    case BOOL_O_ENUM:*)
@@ -2210,16 +2216,6 @@ END_CONFIGURATION
 (*DBG:        return (void *)((((__IEC_UDINT_p *) ptr)->flags & __IEC_FORCE_FLAG)*)
 (*DBG:                        ? &(((__IEC_UDINT_p *) ptr)->fvalue)*)
 (*DBG:                        : ((__IEC_UDINT_p *) ptr)->value);*)
-(*DBG:    case SINT_ENUM:*)
-(*DBG:        return (void *)&((__IEC_SINT_t *) ptr)->value;*)
-(*DBG:    case INT_ENUM:*)
-(*DBG:        return (void *)&((__IEC_INT_t *) ptr)->value;*)
-(*DBG:    case INT_O_ENUM:*)
-(*DBG:        return (void *)((((__IEC_INT_p *) ptr)->flags & __IEC_FORCE_FLAG)*)
-(*DBG:                        ? &(((__IEC_INT_p *) ptr)->fvalue)*)
-(*DBG:                        : ((__IEC_INT_p *) ptr)->value);*)
-(*DBG:    case TIME_ENUM:*)
-(*DBG:        return (void *)&((__IEC_TIME_t *) ptr)->value;*)
 (*DBG:    default:*)
 (*DBG:        return 0;*)
 (*DBG:    }*)
@@ -2232,6 +2228,24 @@ END_CONFIGURATION
 (*DBG:    if (forced) {*)
 (*DBG:        size_t var_size = get_var_size(idx);*)
 (*DBG:        switch (debug_vars[idx].type) {*)
+(*DBG:        case INT_ENUM: {*)
+(*DBG:            memcpy(&((__IEC_INT_t *) ptr)->value, val, var_size);*)
+(*DBG:            ((__IEC_INT_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:    *)
+(*DBG:        case INT_O_ENUM: {*)
+(*DBG:            memcpy((((__IEC_INT_p *) ptr)->value), val, var_size);*)
+(*DBG:            memcpy(&((__IEC_INT_p *) ptr)->fvalue, val, var_size);*)
+(*DBG:            ((__IEC_INT_p *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:        case SINT_ENUM: {*)
+(*DBG:            memcpy(&((__IEC_SINT_t *) ptr)->value, val, var_size);*)
+(*DBG:            ((__IEC_SINT_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:    *)
 (*DBG:        case REAL_ENUM: {*)
 (*DBG:            memcpy(&((__IEC_REAL_t *) ptr)->value, val, var_size);*)
 (*DBG:            ((__IEC_REAL_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
@@ -2244,6 +2258,12 @@ END_CONFIGURATION
 (*DBG:            ((__IEC_REAL_p *) ptr)->flags |= __IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
 (*DBG:        }*)
+(*DBG:        case TIME_ENUM: {*)
+(*DBG:            memcpy(&((__IEC_TIME_t *) ptr)->value, val, var_size);*)
+(*DBG:            ((__IEC_TIME_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:    *)
 (*DBG:        case BOOL_ENUM: {*)
 (*DBG:            memcpy(&((__IEC_BOOL_t *) ptr)->value, val, var_size);*)
 (*DBG:            ((__IEC_BOOL_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
@@ -2279,40 +2299,28 @@ END_CONFIGURATION
 (*DBG:            ((__IEC_UDINT_p *) ptr)->flags |= __IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
 (*DBG:        }*)
-(*DBG:        case SINT_ENUM: {*)
-(*DBG:            memcpy(&((__IEC_SINT_t *) ptr)->value, val, var_size);*)
-(*DBG:            ((__IEC_SINT_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        }*)
-(*DBG:    *)
-(*DBG:        case INT_ENUM: {*)
-(*DBG:            memcpy(&((__IEC_INT_t *) ptr)->value, val, var_size);*)
-(*DBG:            ((__IEC_INT_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        }*)
-(*DBG:    *)
-(*DBG:        case INT_O_ENUM: {*)
-(*DBG:            memcpy((((__IEC_INT_p *) ptr)->value), val, var_size);*)
-(*DBG:            memcpy(&((__IEC_INT_p *) ptr)->fvalue, val, var_size);*)
-(*DBG:            ((__IEC_INT_p *) ptr)->flags |= __IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        }*)
-(*DBG:        case TIME_ENUM: {*)
-(*DBG:            memcpy(&((__IEC_TIME_t *) ptr)->value, val, var_size);*)
-(*DBG:            ((__IEC_TIME_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        }*)
-(*DBG:    *)
 (*DBG:        default:*)
 (*DBG:            break;*)
 (*DBG:        }*)
 (*DBG:    } else {*)
 (*DBG:        switch (debug_vars[idx].type) {*)
+(*DBG:        case INT_ENUM:*)
+(*DBG:            ((__IEC_INT_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        case INT_O_ENUM:*)
+(*DBG:            ((__IEC_INT_p *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        case SINT_ENUM:*)
+(*DBG:            ((__IEC_SINT_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
 (*DBG:        case REAL_ENUM:*)
 (*DBG:            ((__IEC_REAL_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
 (*DBG:        case REAL_O_ENUM:*)
 (*DBG:            ((__IEC_REAL_p *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        case TIME_ENUM:*)
+(*DBG:            ((__IEC_TIME_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
 (*DBG:        case BOOL_ENUM:*)
 (*DBG:            ((__IEC_BOOL_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
@@ -2329,18 +2337,6 @@ END_CONFIGURATION
 (*DBG:            break;*)
 (*DBG:        case UDINT_O_ENUM:*)
 (*DBG:            ((__IEC_UDINT_p *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        case SINT_ENUM:*)
-(*DBG:            ((__IEC_SINT_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        case INT_ENUM:*)
-(*DBG:            ((__IEC_INT_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        case INT_O_ENUM:*)
-(*DBG:            ((__IEC_INT_p *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        case TIME_ENUM:*)
-(*DBG:            ((__IEC_TIME_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
 (*DBG:        default:*)
 (*DBG:            break;*)
