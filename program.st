@@ -812,7 +812,7 @@ PROGRAM main
   SEPTIC_HIGH := SM_16DIN0.I16;
   BACK_SEC_DOOR := DOORS0.Back_Sec0;
   SM_RTD0(STACK := SM_RTD0_STACK);
-  C_F0(Office_C_in := SM_RTD0.TEMP1, Office_C_in := Temp_o_input, Garage_C_in := SM_RTD0.TEMP2, Garage_C_in := temp_G_input, Exterior_C_in := SM_RTD0.TEMP3, RV_C_in := SM_RTD0.TEMP4, HVAC_Sup_C_in := SM_RTD0.TEMP5, HVAC_ret_C_in := SM_RTD0.TEMP6, HVAC_L_C_in := SM_RTD0.TEMP7, HVAC_V_C_in := SM_RTD0.TEMP8);
+  C_F0(Office_C_in := SM_RTD0.TEMP1, Garage_C_in := SM_RTD0.TEMP2, Exterior_C_in := SM_RTD0.TEMP3, RV_C_in := SM_RTD0.TEMP4, HVAC_Sup_C_in := SM_RTD0.TEMP5, HVAC_ret_C_in := SM_RTD0.TEMP6, HVAC_L_C_in := SM_RTD0.TEMP7, HVAC_V_C_in := SM_RTD0.TEMP8);
   HVAC_FB0(HVAC_Office_zone_IN := HVAC_OFFICE, HVAC_Office_zone_IN_V := HVAC_O_M_V, HVAC_Garage_zone_IN := HVAC_GARAGE, HVAC_Garage_zone_IN_V := HVAC_G_M_V, HVAC_Heat_mode_IN := HVAC_HEAT_M, HVAC_Heat_mode_IN_V := HVAC_H_M_V, HVAC_AC_mode_IN := HVAC_COOL_M, HVAC_AC_mode_IN_V := HVAC_C_M_V, Fan_mode := HVAC_F_M_V, Recirc_Mode := HVAC_R_M_V, Pan_SW := HVAC_PAN_SW, Office_T_DN := HVAC_O_TEMP_DN, Office_T_UP_1 := HVAC_O_TEMP_UP, Garage_T_UP := HVAC_G_TEMP_UP, Garage_T_DN := HVAC_G_TEMP_DN, Garage_Temp := GARAGE_TEMP, Office_Temp := OFFICE_TEMP);
   OFFICE_TEMP := C_F0.Office_F_out;
   HVAC_COMP := HVAC_FB0.HVAC_Comp;
