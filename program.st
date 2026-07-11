@@ -92,6 +92,36 @@ FUNCTION_BLOCK DOORS
 END_FUNCTION_BLOCK
 
 FUNCTION_BLOCK HVAC_FB
+  VAR_INPUT
+    HVAC_Office_zone_IN : BOOL;
+    HVAC_Office_zone_IN_V : BOOL;
+    HVAC_Garage_zone_IN : BOOL;
+    HVAC_Garage_zone_IN_V : BOOL;
+    HVAC_Heat_mode_IN : BOOL;
+    HVAC_Heat_mode_IN_V : BOOL;
+    HVAC_AC_mode_IN : BOOL;
+    HVAC_AC_mode_IN_V : BOOL;
+    Fan_mode : BOOL;
+    Recirc_Mode : BOOL;
+    Pan_SW : BOOL;
+    Office_T_DN : BOOL;
+    Office_T_UP_1 : BOOL;
+    Garage_T_UP : BOOL;
+    Garage_T_DN : BOOL;
+    Garage_Temp : REAL;
+    Office_Temp : REAL;
+  END_VAR
+  VAR_OUTPUT
+    HVAC_Comp : BOOL;
+    HVAC_Heat : BOOL;
+    HVAC_Fan : BOOL;
+    O_damp_CLD : BOOL;
+    O_damp_OPEN : BOOL;
+    G_damp_CLD : BOOL;
+    G_damp_OPEN : BOOL;
+    Garage_SP : INT;
+    Office_SP : INT;
+  END_VAR
   VAR
     HVAC_Office_zone : BOOL;
     HVAC_Garage_zone : BOOL;
@@ -146,38 +176,6 @@ FUNCTION_BLOCK HVAC_FB
     CTUD1 : CTUD;
     R_TRIG2 : R_TRIG;
     R_TRIG3 : R_TRIG;
-  END_VAR
-  VAR_INPUT
-    HVAC_Office_zone_IN : BOOL;
-    HVAC_Office_zone_IN_V : BOOL;
-    HVAC_Garage_zone_IN : BOOL;
-    HVAC_Garage_zone_IN_V : BOOL;
-    HVAC_Heat_mode_IN : BOOL;
-    HVAC_Heat_mode_IN_V : BOOL;
-    HVAC_AC_mode_IN : BOOL;
-    HVAC_AC_mode_IN_V : BOOL;
-    Fan_mode : BOOL;
-    Recirc_Mode : BOOL;
-    Pan_SW : BOOL;
-    Office_T_DN : BOOL;
-    Office_T_UP_1 : BOOL;
-    Garage_T_UP : BOOL;
-    Garage_T_DN : BOOL;
-    Garage_Temp : REAL;
-    Office_Temp : REAL;
-  END_VAR
-  VAR_OUTPUT
-    HVAC_Comp : BOOL;
-    HVAC_Heat : BOOL;
-    HVAC_Fan : BOOL;
-    O_damp_CLD : BOOL;
-    O_damp_OPEN : BOOL;
-    G_damp_CLD : BOOL;
-    G_damp_OPEN : BOOL;
-    Garage_SP : INT;
-    Office_SP : INT;
-  END_VAR
-  VAR
     _TMP_REAL_TO_INT2355597_OUT : INT;
     _TMP_SUB6459636_OUT : INT;
     _TMP_LT5381980_OUT : BOOL;
@@ -671,8 +669,6 @@ PROGRAM main
     SM_HOME0 : SM_HOME;
     SM_8RELAY0 : SM_8RELAY;
     SM_8RELAY1 : SM_8RELAY;
-    Temp_o_input : REAL;
-    temp_G_input : REAL;
   END_VAR
   VAR
     WELL_PS AT %IX0.4 : BOOL;
