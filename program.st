@@ -372,6 +372,7 @@ FUNCTION_BLOCK LIGHTING
     SR0 : SR;
     F_TRIG1 : F_TRIG;
     TON0 : TON;
+    _TMP_OR2917667_OUT : BOOL;
   END_VAR
 
   LIGHT_TOGGLE8(LTS_IN := Hobby_LTS, LTS_V := Hobby_LTS_V, ALL_ON := ALL_ON, ALL_OFF := ALL_OFF);
@@ -390,7 +391,8 @@ FUNCTION_BLOCK LIGHTING
   LIGHT_TOGGLE15(LTS_IN := EXT_B_LTS, LTS_V := EXT_B_LTS_V, ALL_ON := ALL_ON, ALL_OFF := ALL_OFF);
   TOF0(IN := Laundry_LT, PT := FF_TIME);
   TON0(IN := Laundry_LT, PT := FF_TIME_LMT);
-  SR0(S1 := Laundry_LT, R := TOF0.Q, R := TON0.Q);
+  _TMP_OR2917667_OUT := OR(TOF0.Q, TON0.Q);
+  SR0(S1 := Laundry_LT, R := _TMP_OR2917667_OUT);
   Office_LT := LIGHT_TOGGLE9.LT_OUT;
   Callie_LT := LIGHT_TOGGLE11.LT_OUT;
   Garage_LT := LIGHT_TOGGLE13.LT_OUT;
@@ -777,7 +779,6 @@ PROGRAM main
   HVAC_FB0(HVAC_Office_zone := HVAC_OFFICE, HVAC_Garage_zone := HVAC_GARAGE, HVAC_Heat_mode := HVAC_H_M_V, HVAC_AC_mode := HVAC_C_M_V, Fan_mode := HVAC_F_M_V, Recirc_Mode := HVAC_R_M_V, Pan_SW := HVAC_PAN_SW, Office_T_DN := HVAC_O_TEMP_DN, Office_T_UP_1 := HVAC_O_TEMP_UP, Garage_T_UP := HVAC_G_TEMP_UP, Garage_T_DN := HVAC_G_TEMP_DN, Garage_Temp := GARAGE_TEMP, Office_Temp := OFFICE_TEMP);
   OFFICE_TEMP := C_F0.Office_F_out;
   HVAC_COMP := HVAC_FB0.HVAC_Comp;
-  GARAGE_TEMP := C_F0.Garage_F_out;
   HVAC_HEAT := HVAC_FB0.HVAC_Heat;
   SEPTIC0(SEPTIC_CTL_IN := SEPTIC_CTL, SEPTIC_H_IN := SEPTIC_HIGH);
   EXT_TEMP := C_F0.Exterior_F_out;
