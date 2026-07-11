@@ -92,24 +92,9 @@ FUNCTION_BLOCK DOORS
 END_FUNCTION_BLOCK
 
 FUNCTION_BLOCK HVAC_FB
-  VAR_INPUT
+  VAR
     HVAC_Office_zone : BOOL;
     HVAC_Garage_zone : BOOL;
-    HVAC_Heat_mode_IN : BOOL;
-    HVAC_Heat_mode_IN_V : BOOL;
-    HVAC_AC_mode_IN : BOOL;
-    HVAC_AC_mode_IN_V : BOOL;
-    Fan_mode : BOOL;
-    Recirc_Mode : BOOL;
-    Pan_SW : BOOL;
-    Office_T_DN : BOOL;
-    Office_T_UP_1 : BOOL;
-    Garage_T_UP : BOOL;
-    Garage_T_DN : BOOL;
-    Garage_Temp : REAL;
-    Office_Temp : REAL;
-  END_VAR
-  VAR
     HVAC_Heat_mode : BOOL;
     HVAC_AC_mode : BOOL;
     Office_T_UP : BOOL;
@@ -162,6 +147,25 @@ FUNCTION_BLOCK HVAC_FB
     R_TRIG2 : R_TRIG;
     R_TRIG3 : R_TRIG;
   END_VAR
+  VAR_INPUT
+    HVAC_Office_zone_IN : BOOL;
+    HVAC_Office_zone_IN_V : BOOL;
+    HVAC_Garage_zone_IN : BOOL;
+    HVAC_Garage_zone_IN_V : BOOL;
+    HVAC_Heat_mode_IN : BOOL;
+    HVAC_Heat_mode_IN_V : BOOL;
+    HVAC_AC_mode_IN : BOOL;
+    HVAC_AC_mode_IN_V : BOOL;
+    Fan_mode : BOOL;
+    Recirc_Mode : BOOL;
+    Pan_SW : BOOL;
+    Office_T_DN : BOOL;
+    Office_T_UP_1 : BOOL;
+    Garage_T_UP : BOOL;
+    Garage_T_DN : BOOL;
+    Garage_Temp : REAL;
+    Office_Temp : REAL;
+  END_VAR
   VAR_OUTPUT
     HVAC_Comp : BOOL;
     HVAC_Heat : BOOL;
@@ -190,10 +194,12 @@ FUNCTION_BLOCK HVAC_FB
     _TMP_LT5702463_OUT : BOOL;
     _TMP_AND6740469_OUT : BOOL;
     _TMP_AND10316625_OUT : BOOL;
+    _TMP_OR10591207_OUT : BOOL;
     _TMP_LIMIT5106302_OUT : INT;
     _TMP_GT4609991_OUT : BOOL;
     _TMP_AND7589689_OUT : BOOL;
     _TMP_AND9797838_OUT : BOOL;
+    _TMP_OR8483614_OUT : BOOL;
     _TMP_NOT2539562_OUT : BOOL;
     _TMP_AND670051_OUT : BOOL;
     _TMP_OR8993542_OUT : BOOL;
@@ -227,7 +233,7 @@ FUNCTION_BLOCK HVAC_FB
   _TMP_AND5532907_OUT := AND(_TMP_AND2326360_OUT, HVAC_AC_mode);
   Garage_SP := _TMP_LIMIT1718129_OUT;
   GarageRunCOOL := _TMP_AND5532907_OUT;
-  _TMP_OR5520087_OUT := OR(HVAC_AC_mode_IN, HVAC_Heat_mode_IN_V);
+  _TMP_OR5520087_OUT := OR(HVAC_AC_mode_IN, HVAC_AC_mode_IN_V);
   HVAC_AC_mode := _TMP_OR5520087_OUT;
   _TMP_REAL_TO_INT6925491_OUT := REAL_TO_INT(Office_Temp);
   _TMP_SUB1239493_OUT := SUB(_TMP_REAL_TO_INT6925491_OUT, Office_SP);
@@ -235,14 +241,18 @@ FUNCTION_BLOCK HVAC_FB
   _TMP_AND6740469_OUT := AND(HVAC_Office_zone, _TMP_LT5702463_OUT);
   _TMP_AND10316625_OUT := AND(_TMP_AND6740469_OUT, HVAC_Heat_mode);
   OfficeRunHEAT := _TMP_AND10316625_OUT;
+  _TMP_OR10591207_OUT := OR(HVAC_Office_zone_IN, HVAC_Office_zone_IN_V);
   R_TRIG2(CLK := true);
   CTUD1(CU := Office_T_UP_1, CD := Office_T_DN, LD := R_TRIG2.Q, PV := 70);
+  HVAC_Office_zone := _TMP_OR10591207_OUT;
   _TMP_LIMIT5106302_OUT := LIMIT(Temp_Minimum, CTUD1.CV, Temp_Maximum);
   _TMP_GT4609991_OUT := GT(_TMP_SUB1239493_OUT, Temp_offset);
   _TMP_AND7589689_OUT := AND(HVAC_Office_zone, _TMP_GT4609991_OUT);
   _TMP_AND9797838_OUT := AND(_TMP_AND7589689_OUT, HVAC_AC_mode);
   Office_SP := _TMP_LIMIT5106302_OUT;
   OfficeRunCOOL := _TMP_AND9797838_OUT;
+  _TMP_OR8483614_OUT := OR(HVAC_Garage_zone_IN, HVAC_Garage_zone_IN_V);
+  HVAC_Garage_zone := _TMP_OR8483614_OUT;
   _TMP_NOT2539562_OUT := NOT(AntiR);
   _TMP_AND670051_OUT := AND(_TMP_NOT2539562_OUT, GarageRunCOOL);
   _TMP_OR8993542_OUT := OR(_TMP_AND670051_OUT, GarageRunHEAT);
@@ -661,6 +671,8 @@ PROGRAM main
     SM_HOME0 : SM_HOME;
     SM_8RELAY0 : SM_8RELAY;
     SM_8RELAY1 : SM_8RELAY;
+    Temp_o_input : REAL;
+    temp_G_input : REAL;
   END_VAR
   VAR
     WELL_PS AT %IX0.4 : BOOL;
@@ -800,8 +812,8 @@ PROGRAM main
   SEPTIC_HIGH := SM_16DIN0.I16;
   BACK_SEC_DOOR := DOORS0.Back_Sec0;
   SM_RTD0(STACK := SM_RTD0_STACK);
-  C_F0(Office_C_in := SM_RTD0.TEMP1, Garage_C_in := SM_RTD0.TEMP2, Exterior_C_in := SM_RTD0.TEMP3, RV_C_in := SM_RTD0.TEMP4, HVAC_Sup_C_in := SM_RTD0.TEMP5, HVAC_ret_C_in := SM_RTD0.TEMP6, HVAC_L_C_in := SM_RTD0.TEMP7, HVAC_V_C_in := SM_RTD0.TEMP8);
-  HVAC_FB0(HVAC_Office_zone := HVAC_OFFICE, HVAC_Garage_zone := HVAC_GARAGE, HVAC_Heat_mode_IN := HVAC_HEAT_M, HVAC_Heat_mode_IN_V := HVAC_H_M_V, HVAC_AC_mode_IN := HVAC_COOL_M, HVAC_AC_mode_IN_V := HVAC_C_M_V, Fan_mode := HVAC_F_M_V, Recirc_Mode := HVAC_R_M_V, Pan_SW := HVAC_PAN_SW, Office_T_DN := HVAC_O_TEMP_DN, Office_T_UP_1 := HVAC_O_TEMP_UP, Garage_T_UP := HVAC_G_TEMP_UP, Garage_T_DN := HVAC_G_TEMP_DN, Garage_Temp := GARAGE_TEMP, Office_Temp := OFFICE_TEMP);
+  C_F0(Office_C_in := SM_RTD0.TEMP1, Office_C_in := Temp_o_input, Garage_C_in := SM_RTD0.TEMP2, Garage_C_in := temp_G_input, Exterior_C_in := SM_RTD0.TEMP3, RV_C_in := SM_RTD0.TEMP4, HVAC_Sup_C_in := SM_RTD0.TEMP5, HVAC_ret_C_in := SM_RTD0.TEMP6, HVAC_L_C_in := SM_RTD0.TEMP7, HVAC_V_C_in := SM_RTD0.TEMP8);
+  HVAC_FB0(HVAC_Office_zone_IN := HVAC_OFFICE, HVAC_Office_zone_IN_V := HVAC_O_M_V, HVAC_Garage_zone_IN := HVAC_GARAGE, HVAC_Garage_zone_IN_V := HVAC_G_M_V, HVAC_Heat_mode_IN := HVAC_HEAT_M, HVAC_Heat_mode_IN_V := HVAC_H_M_V, HVAC_AC_mode_IN := HVAC_COOL_M, HVAC_AC_mode_IN_V := HVAC_C_M_V, Fan_mode := HVAC_F_M_V, Recirc_Mode := HVAC_R_M_V, Pan_SW := HVAC_PAN_SW, Office_T_DN := HVAC_O_TEMP_DN, Office_T_UP_1 := HVAC_O_TEMP_UP, Garage_T_UP := HVAC_G_TEMP_UP, Garage_T_DN := HVAC_G_TEMP_DN, Garage_Temp := GARAGE_TEMP, Office_Temp := OFFICE_TEMP);
   OFFICE_TEMP := C_F0.Office_F_out;
   HVAC_COMP := HVAC_FB0.HVAC_Comp;
   GARAGE_TEMP := C_F0.Garage_F_out;
