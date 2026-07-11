@@ -804,6 +804,7 @@ PROGRAM main
   HVAC_FB0(HVAC_Office_zone := HVAC_OFFICE, HVAC_Garage_zone := HVAC_GARAGE, HVAC_Heat_mode_IN := HVAC_HEAT_M, HVAC_Heat_mode_IN_V := HVAC_H_M_V, HVAC_AC_mode_IN := HVAC_COOL_M, HVAC_AC_mode_IN_V := HVAC_C_M_V, Fan_mode := HVAC_F_M_V, Recirc_Mode := HVAC_R_M_V, Pan_SW := HVAC_PAN_SW, Office_T_DN := HVAC_O_TEMP_DN, Office_T_UP_1 := HVAC_O_TEMP_UP, Garage_T_UP := HVAC_G_TEMP_UP, Garage_T_DN := HVAC_G_TEMP_DN, Garage_Temp := GARAGE_TEMP, Office_Temp := OFFICE_TEMP);
   OFFICE_TEMP := C_F0.Office_F_out;
   HVAC_COMP := HVAC_FB0.HVAC_Comp;
+  GARAGE_TEMP := C_F0.Garage_F_out;
   HVAC_HEAT := HVAC_FB0.HVAC_Heat;
   SEPTIC0(SEPTIC_CTL_IN := SEPTIC_CTL, SEPTIC_H_IN := SEPTIC_HIGH);
   EXT_TEMP := C_F0.Exterior_F_out;
