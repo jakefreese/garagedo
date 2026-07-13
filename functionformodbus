@@ -1,23 +1,21 @@
-// === C2 LED Control - For Numerical Array from Buffer Parser ===
-const coilIndex = 6;   // ← You said the true value is at position 6
+// === C2 LED Control - Using Named Properties from Buffer Parser ===
+const varName = "C2";   // or whatever name you gave it in the parser
 
-// Get the value from the array (Buffer Parser output)
-let value = false;
-if (Array.isArray(msg.payload)) {
-    value = Boolean(msg.payload[coilIndex]);   // Convert 0/1 to true/false
-} else if (msg.payload && typeof msg.payload === "object") {
-    // Fallback if it ever becomes an object
-    value = Boolean(msg.payload["C2"] || msg.payload[coilIndex]);
+if (msg.payload && typeof msg.payload === "object") {
+    const value = msg.payload[varName];
+    
+    if (value === 1 || value === true || value === "1") {
+        return [
+            { payload: `C2 = 1 → LED ON` },
+            { payload: true }
+        ];
+    } else {
+        return [
+            { payload: `C2 = ${value} → LED OFF` },
+            { payload: false }
+        ];
+    }
 }
 
-if (value) {
-    return [
-        { payload: `C2 (index ${coilIndex}) = 1 → LED ON` },  // Output 1: Debug
-        { payload: true }                                      // Output 2: ui-led
-    ];
-} else {
-    return [
-        { payload: `C2 (index ${coilIndex}) = 0 → LED OFF` },
-        { payload: false }
-    ];
-}
+// Fallback
+return [null, { payload: false }];
