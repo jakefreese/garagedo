@@ -1,21 +1,22 @@
-// === C2 LED Control - Using Named Properties from Buffer Parser ===
-const varName = "C2";   // or whatever name you gave it in the parser
+// === C2 LED Control - Direct from Modbus Flex (Boolean Array) ===
+const coilIndex = 2;   // Change this for each coil:
+                       // %QX0.0 → 0
+                       // %QX0.1 → 1  
+                       // %QX0.2 → 2   ← your working one
 
-if (msg.payload && typeof msg.payload === "object") {
-    const value = msg.payload[varName];
-    
-    if (value === 1 || value === true || value === "1") {
-        return [
-            { payload: `C2 = 1 → LED ON` },
-            { payload: true }
-        ];
-    } else {
-        return [
-            { payload: `C2 = ${value} → LED OFF` },
-            { payload: false }
-        ];
-    }
+let value = false;
+if (Array.isArray(msg.payload)) {
+    value = Boolean(msg.payload[coilIndex]);
 }
 
-// Fallback
-return [null, { payload: false }];
+if (value) {
+    return [
+        { payload: `C2 (index ${coilIndex}) ON` },   // Debug output
+        { payload: true }                            // To ui-led / other nodes
+    ];
+} else {
+    return [
+        { payload: `C2 (index ${coilIndex}) OFF` },
+        { payload: false }
+    ];
+}
