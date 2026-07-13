@@ -1,0 +1,25 @@
+// === C2 LED Control - Fixed Version ===
+const varName = "C2";
+
+if (msg.payload && typeof msg.payload === "object") {
+
+    const value = msg.payload[varName];
+
+    if (value === 1 || value === "1") {
+        // LED ON
+        return [
+            { payload: "C2 = 1  → LED ON" },   // Output 1 → Debug
+            { payload: true }                   // Output 2 → ui-led  (MUST be boolean true)
+        ];
+    } else {
+        // LED OFF
+        return [
+            { payload: `C2 = ${value}  → LED OFF` },
+            { payload: false }                  // Output 2 → ui-led
+        ];
+    }
+
+}
+
+// Safety fallback
+return [null, { payload: false }];
