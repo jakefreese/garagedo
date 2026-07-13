@@ -1,0 +1,20 @@
+// === FC2 Input Status - Direct from Modbus Flex Read (Discrete Inputs) ===
+const inputIndex = 2;   // ← CHANGE THIS for each input
+                        // %IX0.0 = 0, %IX0.1 = 1, %IX0.2 = 2, etc.
+
+let value = false;
+if (Array.isArray(msg.payload)) {
+    value = Boolean(msg.payload[inputIndex]);
+}
+
+if (value) {
+    return [
+        { payload: `Input ${inputIndex} = 1 → ACTIVE` },   // Output 1: Debug / status
+        { payload: true }                                  // Output 2: ui-led, switch, etc.
+    ];
+} else {
+    return [
+        { payload: `Input ${inputIndex} = 0 → INACTIVE` },
+        { payload: false }
+    ];
+}
