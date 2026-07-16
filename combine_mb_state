@@ -1,0 +1,20 @@
+// Store both states in flow context
+if (msg.topic === "damper_open") {  // set topic on Modbus node for addr 26
+    flow.set("damper_open", msg.payload);
+} else if (msg.topic === "damper_closed") {  // addr 27
+    flow.set("damper_closed", msg.payload);
+}
+
+// Decide final state
+const isOpen = flow.get("damper_open") || false;
+const isClosed = flow.get("damper_closed") || false;
+
+if (isOpen) {
+    msg.payload = "open";     // or true / 1
+} else if (isClosed) {
+    msg.payload = "closed";   // or false / 0
+} else {
+    msg.payload = "unknown";  // grey/fallback
+}
+
+return msg;
