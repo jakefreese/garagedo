@@ -1,0 +1,35 @@
+// %MD0 (test_rl) - REAL rounded to 2 decimals + BAD timeout
+const data = msg.payload;
+
+let value = 0;
+
+if (Array.isArray(data) && data.length >= 2) {
+    const buf = Buffer.alloc(4);
+    buf.writeUInt16BE(data[0], 0);
+    buf.writeUInt16BE(data[1], 2);
+    
+    value = buf.readFloatBE(0);
+    
+    // Round to 2 decimal places
+    value = Math.round(value * 100) / 100;
+    
+    // Store good value and timestamp
+    context.set("lastValue", value);
+    context.set("lastUpdate", Date.now());
+} 
+
+// Use last known good value during refresh
+msg.payload = context.get("lastValue") || 0;
+msg.topic = "test_rl";
+
+// Timeout: show "BAD" after 60 seconds
+const lastUpdate = context.get("lastUpdate") || 0;
+const age = Date.now() - lastUpdate;
+
+if (age > 60000) {
+    msg.payload = "BAD";
+    msg.color = "#ff0000";   // red for gauge
+    msg.topic = "test_rl - BAD";
+}
+
+return msg;
