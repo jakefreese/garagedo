@@ -1,0 +1,25 @@
+// Water Pressure (IW1) with timeout and stable display
+const value = Array.isArray(msg.payload) ? Number(msg.payload[1]) || 0 : Number(msg.payload) || 0;
+
+// Update only if we have a reasonable value
+if (value !== 0 || msg.payload !== undefined) {  // adjust condition if 0 is valid
+    context.set("lastValue", value);
+    context.set("lastUpdate", Date.now());
+    msg.payload = value;
+    msg.topic = "Water Pressure";
+} else {
+    // Keep previous good value during refresh
+    msg.payload = context.get("lastValue") || 0;
+}
+
+// Check for timeout (1 minute = 60000 ms)
+const lastUpdate = context.get("lastUpdate") || 0;
+const age = Date.now() - lastUpdate;
+
+if (age > 60000) {
+    msg.payload = "BAD";
+    msg.color = "red";           // optional for gauge
+    msg.topic = "Water Pressure - BAD";
+}
+
+return msg;
