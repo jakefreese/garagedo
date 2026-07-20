@@ -1,0 +1,32 @@
+// Stable Garage Temperature - no flashing + BAD if <0 or >120
+const raw = msg.payload;
+
+let value = 0;
+if (Array.isArray(raw) && raw.length > 1) {
+    value = Number(raw[1]) || 0;   // IW1 = Garage Temp
+} else if (typeof raw === "number") {
+    value = raw;
+}
+
+// Store good value persistently
+if (value !== 0 || context.get("lastValue") === undefined) {
+    context.set("lastValue", value);
+    context.set("lastUpdate", Date.now());
+}
+
+// Use last known good value
+msg.payload = context.get("lastValue") || 0;
+msg.topic = "Garage Temperature";
+
+// Check for BAD conditions
+const age = Date.now() - (context.get("lastUpdate") || 0);
+const currentValue = context.get("lastValue") || 0;
+
+if (age > 60000 || currentValue < 0 || currentValue > 120) {
+    msg.payload = "BAD";
+    msg.color = "#ff0000";   // red for gauge
+} else {
+    msg.color = "#00ff00";   // optional: green when good
+}
+
+return msg;
