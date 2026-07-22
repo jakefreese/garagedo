@@ -1,0 +1,29 @@
+// === HVAC Cool/Heat Interlock - Force Reset Version ===
+let cool = flow.get("coolMode") || false;
+let heat = flow.get("heatMode") || false;
+
+const command = (msg.topic || "").toString().toLowerCase().trim();
+
+if (command === "cool") {
+    cool = !cool;
+    if (cool === true) {
+        heat = false;           // Force Heat OFF
+    }
+} 
+else if (command === "heat") {
+    heat = !heat;
+    if (heat === true) {
+        cool = false;           // Force Cool OFF
+    }
+}
+
+// Always save both states
+flow.set("coolMode", cool);
+flow.set("heatMode", heat);
+
+node.warn(`Command: ${command} | Cool: ${cool} | Heat: ${heat}`);  // Debug line
+
+return [
+    { payload: cool,  topic: "cool"  },   // → Coil 32
+    { payload: heat,  topic: "heat"  }    // → Coil 33
+];
