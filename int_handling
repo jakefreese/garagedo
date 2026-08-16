@@ -11,30 +11,28 @@ if (Array.isArray(raw) && raw.length > 1) {
     value = Number(raw);
 }
 
-// Only update last good value if we got a real number
+// Scale 0–10000 → 0–10.0
 if (typeof value === "number" && !isNaN(value)) {
+    value = value / 1000;               // 10000 → 10.0
     context.set("lastGood", value);
     context.set("lastUpdate", Date.now());
 }
 
 // Always force a valid payload (never undefined / null / false)
 let displayValue = context.get("lastGood");
-
 if (displayValue === undefined || displayValue === null) {
-    displayValue = 0;          // safe startup value
+    displayValue = 0; // safe startup value
 }
 
-// Timeout or out-of-range check
+// Timeout or out-of-range check (now based on scaled value)
 const age = Date.now() - (context.get("lastUpdate") || 0);
-
-if (age > 60000 || displayValue < 0 || displayValue > 120) {
+if (age > 60000 || displayValue < 0 || displayValue > 10.5) {
     msg.payload = "BAD";
     msg.color = "#ff0000";
 } else {
-    msg.payload = displayValue;   // always a number
+    msg.payload = displayValue;         // now 0.0 – 10.0
     msg.color = "#00cc00";
 }
 
 msg.topic = "WELL_PUMP_1";
-
 return msg;
