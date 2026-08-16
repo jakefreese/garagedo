@@ -1,0 +1,40 @@
+// Super-stable for Tile Gauge - prevents "false" flash
+const raw = msg.payload;
+let value = null;
+
+// Safely extract the value
+if (Array.isArray(raw) && raw.length > 1) {
+    value = Number(raw[13]);
+} else if (typeof raw === "number") {
+    value = raw;
+} else if (typeof raw === "string" && !isNaN(raw)) {
+    value = Number(raw);
+}
+
+// Only update last good value if we got a real number
+if (typeof value === "number" && !isNaN(value)) {
+    context.set("lastGood", value);
+    context.set("lastUpdate", Date.now());
+}
+
+// Always force a valid payload (never undefined / null / false)
+let displayValue = context.get("lastGood");
+
+if (displayValue === undefined || displayValue === null) {
+    displayValue = 0;          // safe startup value
+}
+
+// Timeout or out-of-range check
+const age = Date.now() - (context.get("lastUpdate") || 0);
+
+if (age > 60000 || displayValue < 0 || displayValue > 120) {
+    msg.payload = "BAD";
+    msg.color = "#ff0000";
+} else {
+    msg.payload = displayValue;   // always a number
+    msg.color = "#00cc00";
+}
+
+msg.topic = "WELL_PUMP_1";
+
+return msg;
